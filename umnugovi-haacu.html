@@ -20,6 +20,10 @@
   --serious-ink:#9c4622;
   --critical-ink:#a32424;
   --on-accent:#FFFDF9;
+  --seq1:#cde2fb; --seq2:#9ec5f4; --seq3:#5598e7; --seq4:#256abf; --seq5:#104281;
+  --seqi1:#0b0b0b; --seqi2:#0b0b0b; --seqi3:#ffffff; --seqi4:#ffffff; --seqi5:#ffffff;
+  /* Статусын өнгө — хоёр темад ижил (тогтмол палитр) */
+  --good-map:#0ca30c; --warning-map:#fab219; --serious-map:#ec835a; --critical-map:#d03b3b;
   --shadow:0 1px 2px rgba(26,24,21,.05), 0 8px 24px -16px rgba(26,24,21,.25);
 }
 @media (prefers-color-scheme: dark){
@@ -40,6 +44,8 @@
     --serious-ink:#ec835a;
     --critical-ink:#e86767;
     --on-accent:#0E0F0E;
+    --seq1:#143b63; --seq2:#1c5cab; --seq3:#2a78d6; --seq4:#6da7ec; --seq5:#b7d3f6;
+    --seqi1:#ffffff; --seqi2:#ffffff; --seqi3:#ffffff; --seqi4:#0b0b0b; --seqi5:#0b0b0b;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
   }
 }
@@ -60,6 +66,8 @@
   --serious-ink:#ec835a;
   --critical-ink:#e86767;
   --on-accent:#0E0F0E;
+  --seq1:#143b63; --seq2:#1c5cab; --seq3:#2a78d6; --seq4:#6da7ec; --seq5:#b7d3f6;
+  --seqi1:#ffffff; --seqi2:#ffffff; --seqi3:#ffffff; --seqi4:#0b0b0b; --seqi5:#0b0b0b;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
 }
 
@@ -100,12 +108,64 @@ select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-vis
 }
 textarea{resize:vertical;min-height:64px;width:100%}
 
-.strip{
-  display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between;
-  margin-top:18px;padding:14px 18px;background:var(--surface);border:1px solid var(--rule);
-  border-radius:4px;box-shadow:var(--shadow);
+/* ---------- hero: газрын зураг | текст ---------- */
+.hero{
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;
+  margin-top:22px;align-items:stretch;
 }
-.progress-block{display:flex;align-items:center;gap:16px;min-width:280px;flex:1}
+@media (max-width:940px){.hero{grid-template-columns:1fr}}
+.hero-map,.hero-text{
+  background:var(--surface);border:1px solid var(--rule);border-radius:4px;
+  box-shadow:var(--shadow);padding:16px 18px;
+}
+.hero-map{display:flex;flex-direction:column}
+.hero-map-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:2px}
+.hero-map-head h3{font-size:15px;font-weight:600;margin:0;letter-spacing:-.005em}
+.hero-map-head .sub{font-size:11.5px;color:var(--muted);margin:2px 0 0}
+.map-nav{display:flex;align-items:center;gap:8px;flex:none}
+button.icon{
+  padding:0;width:24px;height:24px;line-height:1;font-size:15px;
+  border-radius:3px;color:var(--ink-2);display:flex;align-items:center;justify-content:center;
+}
+.map-dots{display:inline-flex;gap:5px;align-items:center}
+.map-dots b{
+  width:6px;height:6px;border-radius:99px;background:var(--rule-strong);
+  display:block;cursor:pointer;border:none;padding:0;
+}
+.map-dots b.on{background:var(--bar);width:16px}
+#mapBox{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.map-svg{width:100%;height:auto;display:block}
+.map-legend{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted);
+  margin-top:6px;padding-top:9px;border-top:1px solid var(--rule);
+}
+.map-legend .ramp{display:inline-flex;align-items:center;gap:0}
+.map-legend .ramp i{width:20px;height:9px;display:block}
+.map-legend .ramp i:first-child{border-radius:2px 0 0 2px}
+.map-legend .ramp i:last-child{border-radius:0 2px 2px 0}
+.map-legend .st{display:inline-flex;align-items:center;gap:5px}
+.map-legend .st i{width:9px;height:9px;border-radius:99px;display:block}
+
+.hero-text{display:flex;flex-direction:column;gap:14px}
+.hero-text .eyebrow{margin:0}
+.lede{
+  font-family:"PT Serif",Georgia,serif;font-size:19px;line-height:1.42;margin:0;
+  letter-spacing:-.005em;text-wrap:balance;color:var(--ink);
+}
+.lede b{font-weight:700}
+.hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;margin:0}
+.hero-stats > div{border-top:1px solid var(--rule);padding-top:8px}
+.hero-stats dt{
+  font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  font-weight:600;margin:0 0 3px;
+}
+.hero-stats dd{
+  margin:0;font-size:19px;font-weight:600;letter-spacing:-.015em;
+  font-variant-numeric:tabular-nums;line-height:1.15;
+}
+.hero-stats dd small{font-size:12px;font-weight:500;color:var(--ink-2);margin-left:3px}
+.hero-stats dd.q{font-size:14px;font-weight:500;line-height:1.4}
+.progress-block{display:flex;align-items:center;gap:14px;margin-top:auto;padding-top:4px}
 .progress-num{
   font-size:30px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
   line-height:1;white-space:nowrap;
@@ -341,21 +401,42 @@ table.grid tr.filled td:first-child{padding-left:7px}
     </div>
   </header>
 
-  <div class="strip">
-    <div class="progress-block">
-      <div class="progress-num" id="countNum">0<small>/14</small></div>
-      <div class="progress-meta">
-        <div class="progress-label" id="countLabel">Сумын мэдээ хүлээгдэж байна</div>
-        <div class="track"><i id="countBar" style="width:0%"></i></div>
+  <section class="hero">
+    <div class="hero-map">
+      <div class="hero-map-head">
+        <div>
+          <h3 id="mapTitle">Хур тунадас</h3>
+          <p class="sub" id="mapSub">сумын схем зураг</p>
+        </div>
+        <div class="map-nav">
+          <button class="icon" id="mapPrev" aria-label="Өмнөх үзүүлэлт">&#8249;</button>
+          <span class="map-dots" id="mapDots"></span>
+          <button class="icon" id="mapNext" aria-label="Дараагийн үзүүлэлт">&#8250;</button>
+        </div>
+      </div>
+      <div id="mapBox"></div>
+      <div class="map-legend" id="mapLegend"></div>
+    </div>
+
+    <div class="hero-text">
+      <p class="eyebrow">Энэ арав хоногийн дүр зураг</p>
+      <p class="lede" id="heroLede">Мэдээ ачаалж байна…</p>
+      <dl class="hero-stats" id="heroStats"></dl>
+      <div class="progress-block">
+        <div class="progress-num" id="countNum">0<small>/14</small></div>
+        <div class="progress-meta">
+          <div class="progress-label" id="countLabel">Сумын мэдээ хүлээгдэж байна</div>
+          <div class="track"><i id="countBar" style="width:0%"></i></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="btnGrid">14 сумыг дараалуулж бөглөх</button>
+        <button id="btnAdd">Нэг сумын мэдээ</button>
+        <button id="btnCsv">CSV татах</button>
+        <button id="btnCopy">Тоймыг хуулах</button>
       </div>
     </div>
-    <div class="actions">
-      <button class="primary" id="btnGrid">14 сумыг дараалуулж бөглөх</button>
-      <button id="btnAdd">Нэг сумын мэдээ</button>
-      <button id="btnCsv">CSV татах</button>
-      <button id="btnCopy">Тоймыг хуулах</button>
-    </div>
-  </div>
+  </section>
 
   <div id="notices"></div>
 
@@ -825,6 +906,217 @@ function barChart(hostId, data, opt){
   });
 }
 
+/* ===================== hero: схем зураг =====================
+   Сумуудын БОДИТ хилийн зураг биш — харьцангуй байрлалыг нь тусгасан схем.
+   Жинхэнэ GeoJSON гарвал MAP_POS-ын оронд хилийн замуудыг зурна. */
+var MAP_POS = {
+  bulgan:       [0.44, 0.07],
+  tsogt_ovoo:   [0.68, 0.15],
+  mandal_ovoo:  [0.50, 0.24],
+  manlai:       [0.80, 0.30],
+  tsogttsetsii: [0.58, 0.36],
+  bayan_ovoo:   [0.72, 0.49],
+  khanbogd:     [0.90, 0.57],
+  khankhongor:  [0.61, 0.56],
+  khurmen:      [0.30, 0.51],
+  nomgon:       [0.76, 0.81],
+  bayandalai:   [0.43, 0.77],
+  noyon:        [0.21, 0.65],
+  sevrei:       [0.19, 0.84],
+  gurvantes:    [0.07, 0.71]
+};
+var CENTER_POS = [0.49, 0.62]; // Даланзадгад — аймгийн төв станц
+
+var MAP_VIEWS = [
+  {key:"precip",     label:"Хур тунадас",       unit:"мм",   dgt:1, type:"seq"},
+  {key:"yield_p",    label:"Бэлчээрийн ургац",  unit:"ц/га", dgt:1, type:"seq"},
+  {key:"soil_moist", label:"Хөрсний чийг",      unit:"%",    dgt:1, type:"seq"},
+  {key:"cond",       label:"Бэлчээрийн нөхцөл", unit:"",     dgt:0, type:"status"}
+];
+var mapView = 0, mapTimer = null, mapPaused = false;
+
+function seqStep(v, lo, hi){
+  if(hi <= lo) return 3;
+  var t = (v - lo) / (hi - lo);
+  return Math.max(1, Math.min(5, Math.floor(t * 5) + 1));
+}
+function shortCond(v){
+  return v === "critical" ? "Онц муу" : (COND_BY_V[v] || "—");
+}
+
+function renderMap(data){
+  var box = document.getElementById("mapBox");
+  var view = MAP_VIEWS[mapView];
+  var byId = {};
+  data.forEach(function(r){ byId[r.soum] = r; });
+
+  document.getElementById("mapTitle").textContent = view.label;
+  var have = 0;
+  SOUMS.forEach(function(s){
+    var r = byId[s.id];
+    if(r && (view.type === "status" ? !!r[view.key] : num(r[view.key]) !== null)) have++;
+  });
+  document.getElementById("mapSub").textContent =
+    "сумын схем зураг · " + have + " сумын мэдээгээр" + (view.unit ? " · " + view.unit : "");
+
+  var lo = 0, hi = 0;
+  if(view.type === "seq"){
+    var vals = [];
+    SOUMS.forEach(function(s){
+      var r = byId[s.id];
+      var v = r ? num(r[view.key]) : null;
+      if(v !== null) vals.push(v);
+    });
+    if(vals.length){ lo = Math.min.apply(null, vals); hi = Math.max.apply(null, vals); }
+  }
+
+  var W = 560, H = 400, PX = 46, PY = 34;
+  var X = function(u){ return PX + u * (W - PX*2); };
+  var Y = function(u){ return PY + u * (H - PY*2); };
+
+  var svg = '<defs></defs>';
+  // аймгийн хүрээ — зөвхөн орон зайн сануулга, хил биш
+  svg += '<rect x="14" y="12" width="' + (W-28) + '" height="' + (H-24) + '" rx="10" '
+      +  'fill="none" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 5"/>';
+
+  // Даланзадгад — аймгийн төв
+  var cx0 = X(CENTER_POS[0]), cy0 = Y(CENTER_POS[1]);
+  svg += '<g><path d="M' + (cx0-6) + ' ' + cy0 + ' L' + cx0 + ' ' + (cy0-6)
+      +  ' L' + (cx0+6) + ' ' + cy0 + ' L' + cx0 + ' ' + (cy0+6) + ' Z" '
+      +  'fill="var(--ink-2)"/>'
+      +  '<text x="' + cx0 + '" y="' + (cy0+18) + '" text-anchor="middle" font-size="9.5" '
+      +  'fill="var(--muted)" font-family="IBM Plex Sans, sans-serif">Даланзадгад</text></g>';
+
+  SOUMS.forEach(function(s){
+    var pos = MAP_POS[s.id];
+    if(!pos) return;
+    var cx = X(pos[0]), cy = Y(pos[1]);
+    var r = byId[s.id];
+    var fill = "none", ink = "var(--muted)", inner = "", sub = "", ring = "var(--rule-strong)";
+    var dash = ' stroke-dasharray="2 3"';
+    var tipVal = "мэдээ ирээгүй";
+
+    if(view.type === "seq"){
+      var v = r ? num(r[view.key]) : null;
+      if(v !== null){
+        var st = seqStep(v, lo, hi);
+        fill = "var(--seq" + st + ")";
+        ink = "var(--seqi" + st + ")";
+        ring = "var(--surface)";
+        dash = "";
+        inner = (+v.toFixed(view.dgt));
+        tipVal = (+v.toFixed(2)) + " " + view.unit;
+      }
+    } else {
+      var c = r ? r[view.key] : null;
+      if(c && COND_BY_V[c]){
+        fill = "var(--" + (c === "good" ? "good" : c === "warning" ? "warning"
+              : c === "serious" ? "serious" : "critical") + "-map)";
+        ring = "var(--surface)";
+        dash = "";
+        sub = shortCond(c);
+        tipVal = COND_BY_V[c];
+      }
+    }
+
+    svg += '<g class="msoum" data-name="' + esc(s.name) + '" data-v="' + esc(tipVal) + '">'
+        +  '<circle cx="' + cx + '" cy="' + cy + '" r="15" fill="' + fill + '" '
+        +  'stroke="' + ring + '" stroke-width="2"' + dash + '/>';
+    if(inner !== ""){
+      svg += '<text x="' + cx + '" y="' + (cy+3.5) + '" text-anchor="middle" font-size="10" '
+          +  'font-weight="600" fill="' + ink + '" font-family="IBM Plex Sans, sans-serif" '
+          +  'style="font-variant-numeric:tabular-nums">' + inner + "</text>";
+    }
+    svg += '<text x="' + cx + '" y="' + (cy+27) + '" text-anchor="middle" font-size="9.5" '
+        +  'fill="var(--ink-2)" font-family="IBM Plex Sans, sans-serif">' + s.name + "</text>";
+    if(sub){
+      svg += '<text x="' + cx + '" y="' + (cy+37) + '" text-anchor="middle" font-size="9" '
+          +  'font-weight="600" fill="var(--ink-2)" font-family="IBM Plex Sans, sans-serif">' + sub + "</text>";
+    }
+    svg += "</g>";
+  });
+
+  box.innerHTML = '<svg class="map-svg" viewBox="0 0 ' + W + " " + H + '" role="img" '
+    + 'aria-label="' + esc(view.label + " — Өмнөговь аймгийн 14 сумын схем зураг") + '">'
+    + svg + "</svg>";
+
+  // тайлбар
+  var lg = document.getElementById("mapLegend");
+  if(view.type === "seq"){
+    var ramp = "";
+    for(var i=1;i<=5;i++) ramp += '<i style="background:var(--seq'+i+')"></i>';
+    lg.innerHTML = '<span>' + (lo === hi ? (+lo.toFixed(view.dgt)) : (+lo.toFixed(view.dgt))) + "</span>"
+      + '<span class="ramp">' + ramp + "</span>"
+      + "<span>" + (+hi.toFixed(view.dgt)) + " " + view.unit + "</span>"
+      + '<span style="margin-left:auto">Тойрог доторх тоо = утга</span>';
+  } else {
+    lg.innerHTML = CONDS.map(function(c){
+      return '<span class="st"><i style="background:var(--' + (c.v === "critical" ? "critical" : c.v) + '-map)"></i>'
+           + (c.v === "critical" ? "Онц муу" : c.label) + "</span>";
+    }).join("") + '<span style="margin-left:auto">Мэдээ ирээгүй нь тасархай хүрээтэй</span>';
+  }
+
+  var dots = document.getElementById("mapDots");
+  dots.innerHTML = MAP_VIEWS.map(function(v, i){
+    return '<b class="' + (i === mapView ? "on" : "") + '" role="button" tabindex="0" '
+         + 'data-i="' + i + '" title="' + v.label + '" aria-label="' + v.label + '"></b>';
+  }).join("");
+}
+
+function setMapView(i){
+  mapView = (i + MAP_VIEWS.length) % MAP_VIEWS.length;
+  renderMap(isDemo ? demoRows() : rows);
+}
+function startMapCycle(){
+  if(mapTimer) clearInterval(mapTimer);
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(reduce) return;
+  mapTimer = setInterval(function(){
+    if(!mapPaused && !document.getElementById("dialogHost").firstChild) setMapView(mapView + 1);
+  }, 7000);
+}
+
+/* ===================== hero: текст тал ===================== */
+function renderHero(data){
+  var lede = document.getElementById("heroLede");
+  var stats = document.getElementById("heroStats");
+
+  if(!data.length){
+    lede.innerHTML = "Энэ арав хоногийн мэдээ хараахан ирээгүй байна.";
+    stats.innerHTML = "";
+    return;
+  }
+
+  var pAvg = meanOf(data, "precip");
+  var tAvg = meanOf(data, "t_avg");
+  var yAvg = meanOf(data, "yield_p");
+  var withNorm = data.filter(function(r){ return num(r.precip) !== null && num(r.precip_norm) > 0; });
+  var normPct = null;
+  if(withNorm.length){
+    normPct = Math.round(withNorm.reduce(function(a,r){
+      return a + num(r.precip)/num(r.precip_norm); }, 0) / withNorm.length * 100);
+  }
+  var risky = data.filter(function(r){ return r.risk === "critical" || r.cond === "critical"; });
+
+  var line = "<b>" + data.length + " сумын мэдээгээр</b> аймгийн дундаж тунадас <b>"
+    + fmt(pAvg) + " мм</b>";
+  if(normPct !== null){
+    line += " — олон жилийн дунджийн <b>" + normPct + "%</b>"
+         + (normPct < 80 ? ", хэвийнээс бага." : (normPct > 120 ? ", хэвийнээс их." : "."));
+  } else { line += "."; }
+  lede.innerHTML = line;
+
+  var riskText = risky.length
+    ? risky.map(function(r){ return SOUM_BY_ID[r.soum] ? SOUM_BY_ID[r.soum].name : r.soum; }).join(", ")
+    : "Байхгүй";
+
+  stats.innerHTML =
+      "<div><dt>Дундаж температур</dt><dd>" + fmt(tAvg) + "<small>°C</small></dd></div>"
+    + "<div><dt>Бэлчээрийн ургац</dt><dd>" + fmt(yAvg, 2) + "<small>ц/га</small></dd></div>"
+    + "<div><dt>Хөрсний чийг</dt><dd>" + fmt(meanOf(data, "soil_moist")) + "<small>%</small></dd></div>"
+    + '<div><dt>Онцгой анхаарах сум</dt><dd class="q">' + esc(riskText) + "</dd></div>";
+}
+
 /* ===================== тойм ===================== */
 function nm(id){ return SOUM_BY_ID[id] ? SOUM_BY_ID[id].name : id; }
 
@@ -953,6 +1245,8 @@ function render(){
   document.getElementById("tableNote").textContent = periodLabel();
 
   renderNotices();
+  renderMap(data);
+  renderHero(data);
   renderTable(data);
   barChart("chartPrecip", data, {
     key:"precip", normKey:"precip_norm", unit:"мм", dgt:1,
@@ -1430,6 +1724,26 @@ function csvText(){
 
   document.getElementById("btnAdd").onclick = openForm;
   document.getElementById("btnGrid").onclick = openGrid;
+
+  /* --- газрын зургийн үзүүлэлт солих --- */
+  document.getElementById("mapPrev").onclick = function(){ setMapView(mapView - 1); startMapCycle(); };
+  document.getElementById("mapNext").onclick = function(){ setMapView(mapView + 1); startMapCycle(); };
+  document.getElementById("mapDots").addEventListener("click", function(e){
+    var i = e.target.getAttribute && e.target.getAttribute("data-i");
+    if(i !== null && i !== undefined){ setMapView(+i); startMapCycle(); }
+  });
+  document.getElementById("mapDots").addEventListener("keydown", function(e){
+    var i = e.target.getAttribute && e.target.getAttribute("data-i");
+    if(i !== null && i !== undefined && (e.key === "Enter" || e.key === " ")){
+      e.preventDefault(); setMapView(+i); startMapCycle();
+    }
+  });
+  var mapCard = document.querySelector(".hero-map");
+  mapCard.addEventListener("mouseenter", function(){ mapPaused = true; });
+  mapCard.addEventListener("mouseleave", function(){ mapPaused = false; });
+  mapCard.addEventListener("focusin", function(){ mapPaused = true; });
+  mapCard.addEventListener("focusout", function(){ mapPaused = false; });
+  startMapCycle();
 
   document.getElementById("btnCopy").onclick = function(){
     var btn = document.getElementById("btnCopy");
