@@ -1,0 +1,17 @@
+{
+  "name": "govi-haacu",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Өмнөговь аймгийн ХАА-н цаг уурын 14 сумын арав хоногийн мэдээ нэгтгэх систем",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.12.0"
+  }
+}

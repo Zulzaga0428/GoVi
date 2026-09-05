@@ -483,7 +483,10 @@ var period = {
   m: now.getMonth() + 1,
   d: now.getDate() <= 10 ? 1 : (now.getDate() <= 20 ? 2 : 3)
 };
-var db = null, unsub = null;
+var store = null, unsub = null;
+var storeInfo = { kind:"", ephemeral:false, gated:false };
+var accessCode = "";
+try { accessCode = localStorage.getItem("govi_code") || ""; } catch(e){}
 var rows = [];
 var isDemo = false;
 var dbState = "loading";
@@ -527,38 +530,156 @@ function demoRows(){
   });
 }
 
-/* ===================== db холболт ===================== */
-function connect(){
-  if(typeof claude === "undefined" || !claude || !claude.use){
-    dbState = "offline"; render(); return;
-  }
-  claude.use("db").then(function(d){
-    db = d;
-    if(!db){ dbState = "offline"; render(); return; }
-    dbState = "ok";
-    subscribe();
-  }).catch(function(){
-    dbState = "offline"; render();
-  });
+/* ===================== хадгалалтын холболт =====================
+   Хуудас хоёр орчинд ажиллана:
+     Artifact дээр  → claude.use("db")
+     Сервер дээр    → /api/reports (GoVi server.js)
+   Хоёулаа доорх нэг интерфейсийг хангана: watch / save / byMonth. */
+
+function artifactBackend(db){
+  return {
+    kind: "artifact",
+    watch: function(k, onData, onErr){
+      return db.collection("reports").where("period", "==", k).onSnapshot(
+        function(snap){ onData(snap.docs.map(function(d){ return d.data(); }).filter(Boolean)); },
+        onErr
+      );
+    },
+    save: function(rec){ return db.doc("reports/" + rec.period + "-" + rec.soum).set(rec); },
+    byMonth: function(m){
+      return db.collection("reports").where("month", "==", m).limit(1000).get()
+        .then(function(snap){ return snap.docs.map(function(d){ return d.data(); }).filter(Boolean); });
+    }
+  };
 }
+
+function api(url, opts){
+  opts = opts || {};
+  var h = { "Content-Type": "application/json" };
+  if(accessCode) h["x-access-code"] = accessCode;
+  return fetch(url, { method: opts.method || "GET", headers: h, body: opts.body })
+    .then(function(res){
+      if(res.status === 401){ var e = new Error("code"); e.code = "code_required"; throw e; }
+      if(!res.ok){ var e2 = new Error("http"); e2.code = "http_" + res.status; throw e2; }
+      return res.json();
+    });
+}
+
+function httpBackend(){
+  return {
+    kind: "http",
+    watch: function(k, onData, onErr){
+      var stopped = false;
+      function tick(){
+        api("/api/reports?period=" + encodeURIComponent(k))
+          .then(function(list){ if(!stopped) onData(list || []); })
+          .catch(function(e){ if(!stopped) onErr(e); });
+      }
+      tick();
+      var timer = setInterval(tick, 20000);
+      return function(){ stopped = true; clearInterval(timer); };
+    },
+    save: function(rec){ return api("/api/reports", { method:"PUT", body: JSON.stringify(rec) }); },
+    byMonth: function(m){ return api("/api/reports?month=" + m); }
+  };
+}
+
+function connect(){
+  probeArtifact().then(function(b){
+    if(b){
+      store = b; storeInfo.kind = "artifact"; dbState = "ok"; subscribe(); return;
+    }
+    return probeHttp();
+  }).catch(function(){ dbState = "offline"; render(); });
+}
+
+function probeArtifact(){
+  if(typeof claude === "undefined" || !claude || !claude.use) return Promise.resolve(null);
+  return claude.use("db")
+    .then(function(d){ return d ? artifactBackend(d) : null; })
+    .catch(function(){ return null; });
+}
+
+function probeHttp(){
+  if(typeof fetch !== "function"){ dbState = "offline"; render(); return Promise.resolve(); }
+  return fetch("/api/config")
+    .then(function(res){ if(!res.ok) throw new Error("no api"); return res.json(); })
+    .then(function(cfg){
+      storeInfo.kind = cfg.storage || "http";
+      storeInfo.ephemeral = !!cfg.ephemeral;
+      storeInfo.gated = !!cfg.gated;
+      store = httpBackend();
+      if(cfg.gated && !accessCode){ dbState = "needcode"; render(); askCode(); return; }
+      dbState = "ok";
+      subscribe();
+    })
+    .catch(function(){ dbState = "offline"; render(); });
+}
+
+function needCode(){
+  accessCode = "";
+  try { localStorage.removeItem("govi_code"); } catch(e){}
+  dbState = "needcode";
+  if(unsub){ try{ unsub(); }catch(e){} unsub = null; }
+  render();
+  askCode();
+}
+
 function subscribe(){
   if(unsub){ try{ unsub(); }catch(e){} unsub = null; }
-  if(!db) return;
+  if(!store) return;
   document.getElementById("syncState").textContent = "Сантай холбогдож байна…";
-  unsub = db.collection("reports").where("period", "==", key()).onSnapshot(
-    function(snap){
-      rows = snap.docs.map(function(d){ return d.data(); }).filter(Boolean);
+  unsub = store.watch(key(),
+    function(list){
+      rows = list;
       dbState = "ok";
       document.getElementById("syncState").textContent =
-        "Шууд холболт идэвхтэй · " + new Date().toLocaleTimeString("mn-MN") + "-д шинэчлэв";
+        (store.kind === "http" ? "Сервертэй холбогдсон · " : "Шууд холболт идэвхтэй · ")
+        + new Date().toLocaleTimeString("mn-MN") + "-д шинэчлэв";
       render();
     },
     function(err){
+      if(err && err.code === "code_required"){ needCode(); return; }
       dbState = (err && err.code === "revoked") ? "revoked" : "error";
       document.getElementById("syncState").textContent = "Холболт тасарлаа";
       render();
     }
   );
+}
+
+function askCode(){
+  var host = document.getElementById("dialogHost");
+  host.innerHTML =
+    '<div class="scrim"><div class="sheet" style="max-width:420px" role="dialog" aria-modal="true" aria-labelledby="cTitle">'
+    + '<div class="sheet-head"><div><h2 id="cTitle">Нэвтрэх код</h2>'
+    + "<p>Энэ хуудас хаалттай. Байгууллагаас өгсөн кодоо оруулна уу.</p></div></div>"
+    + '<div class="sheet-body"><div class="f">'
+    + '<label for="cCode">Код</label><input id="cCode" type="password" autocomplete="off">'
+    + '<span class="hint">Кодыг энэ төхөөрөмжид цээжилнэ.</span></div></div>'
+    + '<div class="sheet-foot"><span class="form-msg" id="cMsg"></span>'
+    + '<button class="primary" id="cGo">Нэвтрэх</button></div></div></div>';
+
+  var input = document.getElementById("cCode");
+  input.focus();
+  function go(){
+    var v = input.value.trim();
+    if(!v){ document.getElementById("cMsg").textContent = "Кодоо оруулна уу."; return; }
+    accessCode = v;
+    api("/api/reports?period=" + encodeURIComponent(key()))
+      .then(function(){
+        try { localStorage.setItem("govi_code", accessCode); } catch(e){}
+        host.innerHTML = "";
+        dbState = "ok";
+        subscribe();
+      })
+      .catch(function(e){
+        accessCode = "";
+        document.getElementById("cMsg").textContent =
+          (e && e.code === "code_required") ? "Код буруу байна." : "Сервертэй холбогдож чадсангүй.";
+      });
+  }
+  document.getElementById("cGo").onclick = go;
+  input.addEventListener("keydown", function(e){ if(e.key === "Enter") go(); });
 }
 
 /* ===================== хүснэгт ===================== */
@@ -798,9 +919,18 @@ function buildSummary(data){
 /* ===================== мэдэгдэл ===================== */
 function renderNotices(){
   var h = "";
-  if(dbState === "offline" || dbState === "error" || dbState === "revoked"){
+  if(dbState === "needcode"){
+    h += '<div class="notice offline"><b>Нэвтрэх шаардлагатай.</b>'
+      + "<span>Кодоо оруулах хүртэл мэдээ харагдахгүй, хадгалагдахгүй.</span></div>";
+  } else if(dbState === "offline" || dbState === "error" || dbState === "revoked"){
     h += '<div class="notice offline"><b>Сантай холбогдоогүй.</b>'
       + "<span>Мэдээ хадгалагдахгүй байна. Хуудсыг нийтэлсэн линкээр нээж, дахин ачаалаад үзнэ үү.</span></div>";
+  }
+  if(storeInfo.ephemeral && dbState === "ok"){
+    h += '<div class="notice offline"><b>Түр зуурын хадгалалт.</b>'
+      + "<span>Сервер дээр өгөгдлийн сан холбогдоогүй тул мэдээ файлд хадгалагдаж байна — "
+      + "серверийг дахин байршуулахад арилна. Railway дээр PostgreSQL нэмж, "
+      + "DATABASE_URL-ыг холбоно уу.</span></div>";
   }
   if(isDemo){
     h += '<div class="notice demo"><b>Жишээ өгөгдөл.</b>'
@@ -812,7 +942,7 @@ function renderNotices(){
 
 /* ===================== ерөнхий render ===================== */
 function render(){
-  isDemo = (rows.length === 0 && dbState !== "loading");
+  isDemo = (rows.length === 0 && dbState !== "loading" && dbState !== "needcode");
   var data = isDemo ? demoRows() : rows;
 
   document.getElementById("countNum").innerHTML = rows.length + "<small>/14</small>";
@@ -951,7 +1081,7 @@ function openForm(){
       msg.textContent = "Ядаж дундаж температур эсвэл хур тунадасны хэмжээг бөглөнө үү.";
       return;
     }
-    if(!db){
+    if(!store){
       msg.className = "form-msg";
       msg.textContent = "Сантай холбогдоогүй тул хадгалах боломжгүй байна.";
       return;
@@ -959,12 +1089,13 @@ function openForm(){
     var btn = document.getElementById("btnSave");
     btn.disabled = true;
     btn.textContent = "Хадгалж байна…";
-    db.doc("reports/" + key() + "-" + soum).set(rec).then(function(){
+    store.save(rec).then(function(){
       close();
     }).catch(function(e){
       btn.disabled = false;
       btn.textContent = "Хадгалах";
       msg.className = "form-msg";
+      if(e && e.code === "code_required"){ close(); needCode(); return; }
       msg.textContent = (e && e.code === "quota_exceeded")
         ? "Санд зай дүүрчээ. Хуучин арав хоногийн мэдээг цэвэрлэх шаардлагатай."
         : "Хадгалж чадсангүй. Түр хүлээгээд дахин оролдоно уу.";
@@ -998,12 +1129,11 @@ var GRID_COLS = 0;
 /* Өмнөх оны ижил сар, ижил арав хоногийн ОЖД-г санал болгоно.
    ОЖД нь арав хоног тус бүрдээ өөр тул зөвхөн яг тэр хугацаанаас авна. */
 function loadNormHints(){
-  if(!db) return Promise.resolve({});
-  return db.collection("reports").where("month", "==", period.m).limit(1000).get()
-    .then(function(snap){
+  if(!store) return Promise.resolve({});
+  return store.byMonth(period.m)
+    .then(function(list){
       var best = {};
-      snap.docs.forEach(function(d){
-        var r = d.data();
+      list.forEach(function(r){
         if(!r || r.decade !== period.d || r.year >= period.y) return;
         if(num(r.precip_norm) === null || num(r.precip_norm) <= 0) return;
         if(!best[r.soum] || r.year > best[r.soum].year){
@@ -1184,7 +1314,7 @@ function openGrid(){
   /* --- бүгдийг хадгалах --- */
   document.getElementById("btnSaveAll").onclick = function(){
     var msg = document.getElementById("gMsg");
-    if(!db){
+    if(!store){
       msg.className = "form-msg";
       msg.textContent = "Сантай холбогдоогүй тул хадгалах боломжгүй байна.";
       return;
@@ -1233,10 +1363,17 @@ function openGrid(){
         return;
       }
       btn.textContent = "Хадгалж байна… " + (i+1) + "/" + recs.length;
-      db.doc("reports/" + key() + "-" + recs[i].soum).set(recs[i]).then(function(){
+      store.save(recs[i]).then(function(){
         okCount++;
         step(i+1);
-      }).catch(function(){
+      }).catch(function(e){
+        if(e && e.code === "code_required"){
+          btn.disabled = false;
+          btn.textContent = "Бүгдийг хадгалах";
+          close();
+          needCode();
+          return;
+        }
         failed.push(SOUM_BY_ID[recs[i].soum] ? SOUM_BY_ID[recs[i].soum].name : recs[i].soum);
         step(i+1);
       });
