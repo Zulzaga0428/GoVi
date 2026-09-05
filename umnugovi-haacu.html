@@ -1,0 +1,991 @@
+<title>Өмнөговь ХААЦУ Нэгтгэл</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --ground:#F5F3EE;
+  --surface:#FFFDF9;
+  --surface-2:#EFEDE6;
+  --ink:#1A1815;
+  --ink-2:#55534D;
+  --muted:#8A877E;
+  --rule:#E2DFD5;
+  --rule-strong:#C9C5B8;
+  --accent:#1F4E79;
+  --bar:#2a78d6;
+  --good-ink:#046504;
+  --warning-ink:#8a5c00;
+  --serious-ink:#9c4622;
+  --critical-ink:#a32424;
+  --on-accent:#FFFDF9;
+  --shadow:0 1px 2px rgba(26,24,21,.05), 0 8px 24px -16px rgba(26,24,21,.25);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --ground:#0E0F0E;
+    --surface:#191A18;
+    --surface-2:#232421;
+    --ink:#F4F2EC;
+    --ink-2:#C3C2B7;
+    --muted:#898781;
+    --rule:#2C2C2A;
+    --rule-strong:#3D3D39;
+    --accent:#8FB8DC;
+    --bar:#3987e5;
+    --good-ink:#3ec13e;
+    --warning-ink:#fab219;
+    --serious-ink:#ec835a;
+    --critical-ink:#e86767;
+    --on-accent:#0E0F0E;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --ground:#0E0F0E;
+  --surface:#191A18;
+  --surface-2:#232421;
+  --ink:#F4F2EC;
+  --ink-2:#C3C2B7;
+  --muted:#898781;
+  --rule:#2C2C2A;
+  --rule-strong:#3D3D39;
+  --accent:#8FB8DC;
+  --bar:#3987e5;
+  --good-ink:#3ec13e;
+  --warning-ink:#fab219;
+  --serious-ink:#ec835a;
+  --critical-ink:#e86767;
+  --on-accent:#0E0F0E;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,"Segoe UI",sans-serif;
+  font-size:14px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 20px 60px}
+
+.masthead{
+  display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;
+  padding-bottom:16px;border-bottom:2px solid var(--ink);
+}
+.eyebrow{
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;margin:0 0 6px;
+}
+h1{
+  font-family:"PT Serif",Georgia,serif;font-weight:700;
+  font-size:clamp(25px,3.3vw,37px);line-height:1.12;margin:0;letter-spacing:-.01em;
+  text-wrap:balance;
+}
+h1 .thin{font-weight:400;font-style:italic;color:var(--ink-2)}
+.period-pick{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:4px}
+.field > label{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+select,input,textarea{
+  font-family:inherit;font-size:14px;color:var(--ink);background:var(--surface);
+  border:1px solid var(--rule-strong);border-radius:3px;padding:7px 9px;
+}
+select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;
+}
+textarea{resize:vertical;min-height:64px;width:100%}
+
+.strip{
+  display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between;
+  margin-top:18px;padding:14px 18px;background:var(--surface);border:1px solid var(--rule);
+  border-radius:4px;box-shadow:var(--shadow);
+}
+.progress-block{display:flex;align-items:center;gap:16px;min-width:280px;flex:1}
+.progress-num{
+  font-size:30px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+  line-height:1;white-space:nowrap;
+}
+.progress-num small{font-size:15px;color:var(--muted);font-weight:500}
+.progress-meta{flex:1;min-width:160px}
+.progress-label{font-size:12.5px;color:var(--ink-2);margin-bottom:6px}
+.track{height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.track > i{display:block;height:100%;background:var(--bar);border-radius:99px;transition:width .35s ease}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{
+  font-family:inherit;font-size:13.5px;font-weight:500;cursor:pointer;
+  border-radius:3px;padding:9px 15px;border:1px solid var(--rule-strong);
+  background:var(--surface);color:var(--ink);
+}
+button:hover{background:var(--surface-2)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button.primary:hover{filter:brightness(1.08)}
+button[disabled]{opacity:.45;cursor:not-allowed}
+
+.notice{
+  margin-top:14px;padding:10px 14px;border-radius:3px;font-size:13px;
+  border:1px solid var(--rule-strong);background:var(--surface-2);color:var(--ink-2);
+  display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
+}
+.notice b{color:var(--ink);font-weight:600}
+.notice.demo{border-left:3px solid var(--warning-ink)}
+.notice.offline{border-left:3px solid var(--serious-ink)}
+
+section{margin-top:34px}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+h2{font-family:"PT Serif",Georgia,serif;font-size:21px;font-weight:700;margin:0;letter-spacing:-.01em}
+.sec-note{font-size:12.5px;color:var(--muted)}
+
+.table-scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:4px;background:var(--surface);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;min-width:1090px;font-size:13px}
+thead th{
+  background:var(--surface);
+  text-align:right;font-weight:600;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);padding:11px 10px 8px;border-bottom:1px solid var(--rule-strong);white-space:nowrap;
+}
+thead th.l{text-align:left}
+tbody td{
+  padding:9px 10px;border-bottom:1px solid var(--rule);text-align:right;
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+tbody td.l{text-align:left;font-variant-numeric:normal}
+tbody tr:hover td{background:var(--surface-2)}
+.soum{font-weight:600}
+.station{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--muted);display:block;font-weight:400}
+tr.missing td{color:var(--muted)}
+tr.missing .soum{font-weight:500}
+.await{font-style:italic;font-size:12.5px}
+.pill{
+  display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;
+  padding:2px 8px 2px 6px;border-radius:99px;border:1px solid currentColor;white-space:nowrap;
+}
+.pill i{width:7px;height:7px;border-radius:99px;background:currentColor;flex:none}
+.pill.good{color:var(--good-ink)}
+.pill.warning{color:var(--warning-ink)}
+.pill.serious{color:var(--serious-ink)}
+.pill.critical{color:var(--critical-ink)}
+.pill.none{color:var(--muted);border-style:dashed}
+.dev{font-weight:600}
+.dev.dry{color:var(--critical-ink)}
+.dev.wet{color:var(--good-ink)}
+tfoot td{
+  padding:11px 10px;border-top:2px solid var(--rule-strong);font-weight:600;text-align:right;
+  font-variant-numeric:tabular-nums;background:var(--surface);
+}
+tfoot td.l{text-align:left}
+
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:20px}
+@media (max-width:900px){.charts{grid-template-columns:1fr}}
+.card{
+  background:var(--surface);border:1px solid var(--rule);border-radius:4px;
+  padding:18px 18px 12px;box-shadow:var(--shadow);position:relative;
+}
+.card h3{font-size:14.5px;font-weight:600;margin:0 0 2px;letter-spacing:-.005em}
+.card .sub{font-size:12px;color:var(--muted);margin:0 0 14px}
+.chart-svg{width:100%;height:auto;display:block}
+.tip{
+  position:absolute;pointer-events:none;opacity:0;transition:opacity .12s;
+  background:var(--ink);color:var(--ground);font-size:12px;line-height:1.45;
+  padding:7px 10px;border-radius:3px;white-space:nowrap;z-index:9;left:18px;
+  font-variant-numeric:tabular-nums;box-shadow:0 4px 14px rgba(0,0,0,.25);
+}
+.tip b{font-weight:600;display:block;margin-bottom:2px}
+.legend-note{
+  display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);
+  margin-top:10px;padding-top:9px;border-top:1px solid var(--rule);
+}
+.legend-note span{display:inline-flex;align-items:center;gap:6px}
+.swatch{width:14px;height:9px;border-radius:2px;background:var(--bar);flex:none}
+.swatch.tick{width:2px;height:13px;border-radius:0;background:var(--ink-2)}
+.empty-chart{padding:34px 0;text-align:center;color:var(--muted);font-size:13px;font-style:italic}
+
+.summary-card{background:var(--surface);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow);overflow:hidden}
+.summary-body{
+  padding:22px 26px;font-family:"PT Serif",Georgia,serif;font-size:15.5px;line-height:1.72;
+  color:var(--ink);max-width:70ch;
+}
+.summary-body p{margin:0 0 13px}
+.summary-body p:last-child{margin-bottom:0}
+.summary-body .hd{
+  font-family:"IBM Plex Sans",sans-serif;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px;
+}
+.summary-foot{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:12px 26px;border-top:1px solid var(--rule);background:var(--surface-2);
+  font-size:12.5px;color:var(--muted);
+}
+
+.scrim{
+  position:fixed;inset:0;background:rgba(20,18,15,.55);
+  display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;
+  overflow-y:auto;z-index:50;
+}
+.sheet{
+  background:var(--ground);border-radius:5px;width:100%;max-width:720px;
+  box-shadow:0 24px 70px -20px rgba(0,0,0,.55);border:1px solid var(--rule-strong);
+}
+.sheet-head{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  padding:20px 24px 16px;border-bottom:1px solid var(--rule);
+}
+.sheet-head h2{font-size:19px}
+.sheet-head p{margin:4px 0 0;font-size:12.5px;color:var(--muted)}
+.sheet-body{padding:20px 24px}
+.grp{margin-bottom:22px}
+.grp:last-child{margin-bottom:0}
+.grp > h4{
+  font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);
+  font-weight:600;margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid var(--rule);
+}
+.rowgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+.rowgrid.full{grid-template-columns:1fr}
+.f{display:flex;flex-direction:column;gap:5px}
+.f label{font-size:12px;color:var(--ink-2);font-weight:500}
+.f .hint{font-size:11px;color:var(--muted)}
+.sheet-foot{
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;
+  padding:16px 24px;border-top:1px solid var(--rule);background:var(--surface-2);
+  border-radius:0 0 5px 5px;
+}
+.form-msg{font-size:12.5px;color:var(--critical-ink);font-weight:500;flex:1;min-width:180px}
+.form-msg.ok{color:var(--good-ink)}
+.close-x{border:none;background:none;font-size:22px;line-height:1;color:var(--muted);padding:2px 6px;border-radius:3px}
+.close-x:hover{background:var(--surface-2);color:var(--ink)}
+footer.credit{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
+  font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">Ус цаг уур, орчны шинжилгээний төв · Хөдөө аж ахуйн цаг уур</p>
+      <h1>Өмнөговь аймаг <span class="thin">— арав хоногийн нэгтгэл</span></h1>
+    </div>
+    <div class="period-pick">
+      <div class="field">
+        <label for="pYear">Он</label>
+        <select id="pYear"></select>
+      </div>
+      <div class="field">
+        <label for="pMonth">Сар</label>
+        <select id="pMonth"></select>
+      </div>
+      <div class="field">
+        <label for="pDec">Арав хоног</label>
+        <select id="pDec">
+          <option value="1">I (1–10)</option>
+          <option value="2">II (11–20)</option>
+          <option value="3">III (21–сүүл)</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <div class="strip">
+    <div class="progress-block">
+      <div class="progress-num" id="countNum">0<small>/14</small></div>
+      <div class="progress-meta">
+        <div class="progress-label" id="countLabel">Сумын мэдээ хүлээгдэж байна</div>
+        <div class="track"><i id="countBar" style="width:0%"></i></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="btnAdd">Сумын мэдээ оруулах</button>
+      <button id="btnCsv">CSV татах</button>
+      <button id="btnCopy">Тоймыг хуулах</button>
+    </div>
+  </div>
+
+  <div id="notices"></div>
+
+  <section>
+    <div class="sec-head">
+      <h2>Сум тус бүрийн үзүүлэлт</h2>
+      <span class="sec-note" id="tableNote"></span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="l">Сум / харуул</th>
+            <th>t° дундаж</th>
+            <th>t° их / бага</th>
+            <th>Тунадас, мм</th>
+            <th>ОЖД-аас</th>
+            <th>Хөрсний чийг, %</th>
+            <th>Цас, см</th>
+            <th>Ургамлын өндөр, см</th>
+            <th>Ургац, ц/га</th>
+            <th class="l">Хөгжлийн үе шат</th>
+            <th class="l">Бэлчээрийн нөхцөл</th>
+            <th class="l">Ган / зуд</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot id="tfoot"></tfoot>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Харьцуулалт</h2>
+      <span class="sec-note">Мэдээгээ өгсөн сумууд эрэмбэлэгдэн орлоо</span>
+    </div>
+    <div class="charts">
+      <div class="card">
+        <h3>Хур тунадас, мм</h3>
+        <p class="sub">Олон жилийн дундажтай харьцуулав</p>
+        <div id="chartPrecip"></div>
+        <div class="legend-note">
+          <span><i class="swatch"></i> Тайлант арав хоногийн тунадас</span>
+          <span><i class="swatch tick"></i> Олон жилийн дундаж</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Бэлчээрийн ургац, ц/га</h3>
+        <p class="sub">Хатаамал жинд шилжүүлсэн ургацын хэмжээ</p>
+        <div id="chartYield"></div>
+        <div class="legend-note">
+          <span><i class="swatch"></i> Бэлчээрийн ургац</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Аймгийн тойм</h2>
+      <span class="sec-note">Ирсэн мэдээнээс автоматаар боловсруулав</span>
+    </div>
+    <div class="summary-card">
+      <div class="summary-body" id="summary"></div>
+      <div class="summary-foot">
+        <span id="summaryMeta"></span>
+        <span>Хянасан: ХАА-н цаг уурын инженер ____________________</span>
+      </div>
+    </div>
+  </section>
+
+  <footer class="credit">
+    <span>Өмнөговь аймгийн УЦУОШГ · ХАА-н цаг уурын салбар · Даланзадгад</span>
+    <span id="syncState">—</span>
+  </footer>
+</div>
+
+<div id="dialogHost"></div>
+
+<script>
+/* ===================== тогтмолууд ===================== */
+var SOUMS = [
+  {id:"bayan_ovoo",   name:"Баян-Овоо",   st:"ХАА-01"},
+  {id:"bayandalai",   name:"Баяндалай",   st:"ХАА-02"},
+  {id:"bulgan",       name:"Булган",      st:"ХАА-03"},
+  {id:"gurvantes",    name:"Гурвантэс",   st:"ХАА-04"},
+  {id:"mandal_ovoo",  name:"Мандал-Овоо", st:"ХАА-05"},
+  {id:"manlai",       name:"Манлай",      st:"ХАА-06"},
+  {id:"noyon",        name:"Ноён",        st:"ХАА-07"},
+  {id:"nomgon",       name:"Номгон",      st:"ХАА-08"},
+  {id:"sevrei",       name:"Сэврэй",      st:"ХАА-09"},
+  {id:"khanbogd",     name:"Ханбогд",     st:"ХАА-10"},
+  {id:"khankhongor",  name:"Ханхонгор",   st:"ХАА-11"},
+  {id:"khurmen",      name:"Хүрмэн",      st:"ХАА-12"},
+  {id:"tsogt_ovoo",   name:"Цогт-Овоо",   st:"ХАА-13"},
+  {id:"tsogttsetsii", name:"Цогтцэций",   st:"ХАА-14"}
+];
+var SOUM_BY_ID = {};
+SOUMS.forEach(function(s){ SOUM_BY_ID[s.id] = s; });
+
+var PHASES = ["Ургалтын идэвхгүй үе","Ногооролт","Навчлалт","Түрүүлэлт","Цэцэглэлт","Үр боловсролт","Хагдрал"];
+var CONDS = [
+  {v:"good", label:"Сайн"},
+  {v:"warning", label:"Дунд"},
+  {v:"serious", label:"Муу"},
+  {v:"critical", label:"Онцгой муу"}
+];
+var RISKS = [
+  {v:"none", label:"Байхгүй"},
+  {v:"good", label:"Бага"},
+  {v:"warning", label:"Дунд"},
+  {v:"critical", label:"Өндөр"}
+];
+var COND_BY_V = {}; CONDS.forEach(function(c){ COND_BY_V[c.v] = c.label; });
+var RISK_BY_V = {}; RISKS.forEach(function(r){ RISK_BY_V[r.v] = r.label; });
+var MONTHS = ["1-р сар","2-р сар","3-р сар","4-р сар","5-р сар","6-р сар","7-р сар","8-р сар","9-р сар","10-р сар","11-р сар","12-р сар"];
+var DEC_LABEL = {1:"I (1–10)", 2:"II (11–20)", 3:"III (21–сүүл)"};
+var DEC_ROMAN = {1:"I", 2:"II", 3:"III"};
+
+/* ===================== төлөв ===================== */
+var now = new Date();
+var period = {
+  y: now.getFullYear(),
+  m: now.getMonth() + 1,
+  d: now.getDate() <= 10 ? 1 : (now.getDate() <= 20 ? 2 : 3)
+};
+var db = null, unsub = null;
+var rows = [];
+var isDemo = false;
+var dbState = "loading";
+
+function key(){ return period.y + "-" + (period.m < 10 ? "0" : "") + period.m + "-" + period.d; }
+function num(v){
+  if(v === null || v === undefined || v === "") return null;
+  var n = +v; return isFinite(n) ? n : null;
+}
+function fmt(v, d){ return (v === null || v === undefined) ? "—" : (+v).toFixed(d === undefined ? 1 : d); }
+function fmt0(v){ return (v === null || v === undefined) ? "—" : String(Math.round(v)); }
+function esc(s){
+  return String(s === null || s === undefined ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function periodLabel(){
+  return period.y + " оны " + MONTHS[period.m-1] + "ын " + DEC_ROMAN[period.d] + " арав хоног";
+}
+
+/* ===================== жишээ өгөгдөл =====================
+   Хоосон үед хуудас юу хийдгийг үзүүлэх зорилготой, ил тод тэмдэглэсэн жишээ.
+   Санд хадгалагддаггүй; эхний жинхэнэ мэдээ ормогц бүрмөсөн алга болно. */
+function demoRows(){
+  var seed = [
+    ["bayan_ovoo",  17.4, 31.2, 3.6,  6.2, 11.4, 12.8, 0, 6.1, 2.80, "Үр боловсролт", "warning",  "warning"],
+    ["bayandalai",  16.1, 29.8, 2.9,  4.1,  9.8, 10.2, 0, 5.4, 2.20, "Үр боловсролт", "serious",  "warning"],
+    ["bulgan",      18.2, 32.6, 4.8,  9.7, 12.6, 15.4, 0, 7.8, 3.60, "Үр боловсролт", "good",     "good"],
+    ["gurvantes",   15.6, 28.4, 2.2,  2.4, 10.9,  8.6, 0, 4.2, 1.60, "Хагдрал",       "critical", "critical"],
+    ["mandal_ovoo", 17.9, 31.8, 3.9, 11.3, 12.1, 16.9, 0, 8.4, 3.90, "Үр боловсролт", "good",     "good"],
+    ["manlai",      17.1, 30.9, 3.1,  5.6, 11.7, 11.4, 0, 5.9, 2.60, "Үр боловсролт", "warning",  "warning"],
+    ["nomgon",      16.4, 30.1, 2.6,  3.8, 11.2,  9.7, 0, 4.9, 2.00, "Хагдрал",       "serious",  "warning"],
+    ["khanbogd",    18.6, 33.1, 4.2,  7.9, 12.4, 13.6, 0, 6.6, 3.10, "Үр боловсролт", "warning",  "good"],
+    ["khankhongor", 17.7, 31.4, 3.4,  8.6, 11.9, 14.1, 0, 7.1, 3.30, "Үр боловсролт", "good",     "good"]
+  ];
+  return seed.map(function(v){
+    return {
+      soum:v[0], t_avg:v[1], t_max:v[2], t_min:v[3], precip:v[4], precip_norm:v[5],
+      soil_moist:v[6], snow:v[7], plant_h:v[8], yield_p:v[9],
+      phase:v[10], cond:v[11], risk:v[12], obs:"жишээ", note:""
+    };
+  });
+}
+
+/* ===================== db холболт ===================== */
+function connect(){
+  if(typeof claude === "undefined" || !claude || !claude.use){
+    dbState = "offline"; render(); return;
+  }
+  claude.use("db").then(function(d){
+    db = d;
+    if(!db){ dbState = "offline"; render(); return; }
+    dbState = "ok";
+    subscribe();
+  }).catch(function(){
+    dbState = "offline"; render();
+  });
+}
+function subscribe(){
+  if(unsub){ try{ unsub(); }catch(e){} unsub = null; }
+  if(!db) return;
+  document.getElementById("syncState").textContent = "Сантай холбогдож байна…";
+  unsub = db.collection("reports").where("period", "==", key()).onSnapshot(
+    function(snap){
+      rows = snap.docs.map(function(d){ return d.data(); }).filter(Boolean);
+      dbState = "ok";
+      document.getElementById("syncState").textContent =
+        "Шууд холболт идэвхтэй · " + new Date().toLocaleTimeString("mn-MN") + "-д шинэчлэв";
+      render();
+    },
+    function(err){
+      dbState = (err && err.code === "revoked") ? "revoked" : "error";
+      document.getElementById("syncState").textContent = "Холболт тасарлаа";
+      render();
+    }
+  );
+}
+
+/* ===================== хүснэгт ===================== */
+function devCell(r){
+  var p = num(r.precip), n = num(r.precip_norm);
+  if(p === null || n === null || n === 0) return "<td>—</td>";
+  var pct = Math.round(p / n * 100);
+  var cls = pct < 80 ? " dry" : (pct > 120 ? " wet" : "");
+  return '<td><span class="dev' + cls + '">' + pct + "%</span></td>";
+}
+function pill(v, map){
+  if(!v || !map[v]) return '<span class="pill none">—</span>';
+  if(v === "none") return '<span class="pill none">' + map[v] + "</span>";
+  return '<span class="pill ' + v + '"><i></i>' + map[v] + "</span>";
+}
+function meanOf(data, f){
+  var xs = [];
+  data.forEach(function(r){ var v = num(r[f]); if(v !== null) xs.push(v); });
+  if(!xs.length) return null;
+  return xs.reduce(function(a,b){ return a+b; }, 0) / xs.length;
+}
+function renderTable(data){
+  var byId = {};
+  data.forEach(function(r){ byId[r.soum] = r; });
+
+  document.getElementById("tbody").innerHTML = SOUMS.map(function(s){
+    var r = byId[s.id];
+    var head = '<td class="l"><span class="soum">' + s.name + '</span><span class="station">' + s.st + "</span></td>";
+    if(!r){
+      return '<tr class="missing">' + head + '<td colspan="11" class="l await">Мэдээ хүлээгдэж байна</td></tr>';
+    }
+    return "<tr>" + head
+      + "<td>" + fmt(num(r.t_avg)) + "</td>"
+      + "<td>" + fmt(num(r.t_max)) + " / " + fmt(num(r.t_min)) + "</td>"
+      + "<td>" + fmt(num(r.precip)) + "</td>"
+      + devCell(r)
+      + "<td>" + fmt(num(r.soil_moist)) + "</td>"
+      + "<td>" + fmt0(num(r.snow)) + "</td>"
+      + "<td>" + fmt(num(r.plant_h)) + "</td>"
+      + "<td>" + fmt(num(r.yield_p), 2) + "</td>"
+      + '<td class="l">' + esc(r.phase || "—") + "</td>"
+      + '<td class="l">' + pill(r.cond, COND_BY_V) + "</td>"
+      + '<td class="l">' + pill(r.risk, RISK_BY_V) + "</td>"
+      + "</tr>";
+  }).join("");
+
+  document.getElementById("tfoot").innerHTML = !data.length ? "" :
+    '<tr><td class="l">Аймгийн дундаж · ' + data.length + " сум</td>"
+    + "<td>" + fmt(meanOf(data,"t_avg")) + "</td><td>—</td>"
+    + "<td>" + fmt(meanOf(data,"precip")) + "</td><td>—</td>"
+    + "<td>" + fmt(meanOf(data,"soil_moist")) + "</td>"
+    + "<td>" + fmt0(meanOf(data,"snow")) + "</td>"
+    + "<td>" + fmt(meanOf(data,"plant_h")) + "</td>"
+    + "<td>" + fmt(meanOf(data,"yield_p"), 2) + "</td>"
+    + '<td colspan="3"></td></tr>';
+}
+
+/* ===================== графикууд ===================== */
+function niceMax(v){
+  if(!(v > 0)) return 1;
+  var mag = Math.pow(10, Math.floor(Math.log10(v)));
+  var s = v / mag;
+  var step = s <= 1 ? 1 : (s <= 2 ? 2 : (s <= 2.5 ? 2.5 : (s <= 5 ? 5 : 10)));
+  return step * mag;
+}
+function barChart(hostId, data, opt){
+  var host = document.getElementById(hostId);
+  host.innerHTML = "";
+  var items = [];
+  data.forEach(function(r){
+    var v = num(r[opt.key]);
+    if(v === null) return;
+    items.push({
+      name: SOUM_BY_ID[r.soum] ? SOUM_BY_ID[r.soum].name : r.soum,
+      v: v,
+      n: opt.normKey ? num(r[opt.normKey]) : null
+    });
+  });
+  items.sort(function(a,b){ return b.v - a.v; });
+
+  if(!items.length){
+    host.innerHTML = '<p class="empty-chart">Мэдээ ороогүй тул график зурагдаагүй байна</p>';
+    return;
+  }
+
+  var W = 560, GL = 108, GR = 54, rowH = 25, barH = 12, top = 20, bot = 28;
+  var plotW = W - GL - GR;
+  var H = top + items.length * rowH + bot;
+  var peak = 0;
+  items.forEach(function(d){ peak = Math.max(peak, d.v, d.n || 0); });
+  var maxV = niceMax(peak);
+  var x = function(v){ return GL + (v / maxV) * plotW; };
+  var ticks = [0, maxV/4, maxV/2, maxV*3/4, maxV];
+
+  var svg = "";
+  ticks.forEach(function(t){
+    var px = x(t).toFixed(1);
+    svg += '<line x1="' + px + '" y1="' + top + '" x2="' + px + '" y2="' + (H-bot) + '" stroke="var(--rule)" stroke-width="1"/>'
+        +  '<text x="' + px + '" y="' + (H-bot+15) + '" text-anchor="middle" font-size="10" fill="var(--muted)" '
+        +  'font-family="IBM Plex Sans, sans-serif">' + (+t.toFixed(1)) + "</text>";
+  });
+
+  items.forEach(function(d, i){
+    var y = top + i * rowH;
+    var w = Math.max(2, x(d.v) - GL);
+    svg += '<g class="brow" data-name="' + esc(d.name) + '" data-v="' + d.v + '" data-n="' + (d.n === null ? "" : d.n) + '" data-cy="' + (y + rowH/2) + '">'
+        +  '<rect x="0" y="' + y + '" width="' + W + '" height="' + rowH + '" fill="transparent"/>'
+        +  '<text x="' + (GL-10) + '" y="' + (y + rowH/2 + 4) + '" text-anchor="end" font-size="11.5" fill="var(--ink-2)" '
+        +  'font-family="IBM Plex Sans, sans-serif">' + esc(d.name) + "</text>"
+        +  '<rect x="' + GL + '" y="' + (y + (rowH-barH)/2) + '" width="' + w.toFixed(1) + '" height="' + barH + '" rx="4" fill="var(--bar)"/>'
+        +  '<text x="' + (GL + w + 8).toFixed(1) + '" y="' + (y + rowH/2 + 4) + '" font-size="11.5" fill="var(--ink)" '
+        +  'font-family="IBM Plex Sans, sans-serif" style="font-variant-numeric:tabular-nums">' + (+d.v.toFixed(opt.dgt || 1)) + "</text>";
+    if(d.n !== null && d.n > 0 && d.n <= maxV){
+      svg += '<rect x="' + (x(d.n)-1).toFixed(1) + '" y="' + (y + (rowH-barH)/2 - 3) + '" width="2" height="' + (barH+6) + '" fill="var(--ink-2)"/>';
+    }
+    svg += "</g>";
+  });
+
+  svg += '<line x1="' + GL + '" y1="' + top + '" x2="' + GL + '" y2="' + (H-bot) + '" stroke="var(--rule-strong)" stroke-width="1"/>'
+      +  '<text x="' + (W-GR+4) + '" y="' + (H-bot+15) + '" font-size="10" fill="var(--muted)" '
+      +  'font-family="IBM Plex Sans, sans-serif">' + opt.unit + "</text>";
+
+  host.innerHTML = '<svg class="chart-svg" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(opt.aria) + '">'
+    + svg + "</svg><div class=\"tip\"></div>";
+
+  var tip = host.querySelector(".tip");
+  var svgEl = host.querySelector("svg");
+  Array.prototype.forEach.call(host.querySelectorAll(".brow"), function(g){
+    g.addEventListener("mouseenter", function(){
+      var n = g.getAttribute("data-n");
+      var v = +g.getAttribute("data-v");
+      var html = "<b>" + g.getAttribute("data-name") + "</b>" + (+v.toFixed(2)) + " " + opt.unit;
+      if(n){
+        html += "<br>олон жилийн дундаж " + (+(+n).toFixed(1)) + " " + opt.unit
+             +  " · " + Math.round(v / (+n) * 100) + "%";
+      }
+      tip.innerHTML = html;
+      tip.style.opacity = 1;
+      var scale = svgEl.getBoundingClientRect().height / H;
+      tip.style.top = (svgEl.offsetTop + (+g.getAttribute("data-cy")) * scale + 14) + "px";
+    });
+    g.addEventListener("mouseleave", function(){ tip.style.opacity = 0; });
+  });
+}
+
+/* ===================== тойм ===================== */
+function nm(id){ return SOUM_BY_ID[id] ? SOUM_BY_ID[id].name : id; }
+
+function buildSummary(data){
+  var el = document.getElementById("summary");
+  var meta = document.getElementById("summaryMeta");
+  meta.textContent = periodLabel() + " · " + data.length + "/14 сумын мэдээгээр";
+
+  if(!data.length){
+    el.innerHTML = '<p class="hd">' + periodLabel() + "</p>"
+      + "<p>Энэ арав хоногийн мэдээ хараахан ирээгүй байна. Сумын харуулууд мэдээгээ оруулмагц "
+      + "тойм автоматаар боловсрогдож, доор бэлэн болно.</p>";
+    return;
+  }
+
+  var tAvg = meanOf(data,"t_avg"), pAvg = meanOf(data,"precip");
+  var withP = data.filter(function(r){ return num(r.precip) !== null; })
+                  .sort(function(a,b){ return num(b.precip) - num(a.precip); });
+  var withNorm = data.filter(function(r){ return num(r.precip) !== null && num(r.precip_norm) > 0; });
+  var normPct = null;
+  if(withNorm.length){
+    normPct = Math.round(withNorm.reduce(function(a,r){
+      return a + num(r.precip)/num(r.precip_norm); }, 0) / withNorm.length * 100);
+  }
+  var below = withNorm.filter(function(r){ return num(r.precip)/num(r.precip_norm) < 0.8; })
+                      .map(function(r){ return nm(r.soum); });
+  var snowy = data.filter(function(r){ return num(r.snow) > 0; })
+                  .map(function(r){ return nm(r.soum) + " (" + fmt0(num(r.snow)) + " см)"; });
+  var badCond = data.filter(function(r){ return r.cond === "serious" || r.cond === "critical"; })
+                    .map(function(r){ return nm(r.soum); });
+  var goodCond = data.filter(function(r){ return r.cond === "good"; }).map(function(r){ return nm(r.soum); });
+  var highRisk = data.filter(function(r){ return r.risk === "critical"; }).map(function(r){ return nm(r.soum); });
+  var midRisk = data.filter(function(r){ return r.risk === "warning"; }).map(function(r){ return nm(r.soum); });
+
+  var phaseCount = {};
+  data.forEach(function(r){ if(r.phase) phaseCount[r.phase] = (phaseCount[r.phase] || 0) + 1; });
+  var topPhase = Object.keys(phaseCount).sort(function(a,b){ return phaseCount[b] - phaseCount[a]; })[0];
+
+  var P = [];
+  var s1 = "<p><b>Агаарын температур, хур тунадас.</b> Тайлант арав хоногт аймгийн хэмжээгээр агаарын дундаж температур "
+    + fmt(tAvg) + "°C байлаа. Хур тунадасны дундаж " + fmt(pAvg) + " мм";
+  if(withP.length){
+    var wet = withP[0], dry = withP[withP.length-1];
+    s1 += ", хамгийн их нь " + nm(wet.soum) + " суманд " + fmt(num(wet.precip)) + " мм, хамгийн бага нь "
+       + nm(dry.soum) + " суманд " + fmt(num(dry.precip)) + " мм тэмдэглэгдэв";
+  }
+  s1 += ".";
+  if(normPct !== null){
+    s1 += " Энэ нь олон жилийн дунджийн " + normPct + "%-тай тэнцэж байна.";
+  }
+  P.push(s1 + "</p>");
+
+  if(below.length){
+    P.push("<p><b>Хэвийн бус хуурайшилт.</b> " + below.join(", ")
+      + " суманд хур тунадас олон жилийн дунджийн 80%-иас доогуур орсон нь бэлчээрийн ургамлын "
+      + "ус хангамжид сөргөөр нөлөөлөх эрсдэлтэй байна.</p>");
+  }
+
+  var s3 = "<p><b>Хөрс, бэлчээрийн байдал.</b> Хөрсний дундаж чийг " + fmt(meanOf(data,"soil_moist"))
+    + "%, бэлчээрийн ургамлын өндөр дунджаар " + fmt(meanOf(data,"plant_h")) + " см, ургац "
+    + fmt(meanOf(data,"yield_p"), 2) + " ц/га байна.";
+  if(topPhase){
+    s3 += " Ургамлын хөгжлийн зонхилох үе шат — " + topPhase.toLowerCase()
+       + " (" + phaseCount[topPhase] + " суманд).";
+  }
+  if(snowy.length){ s3 += " Цасан бүрхүүлтэй: " + snowy.join(", ") + "."; }
+  P.push(s3 + "</p>");
+
+  var c = [];
+  if(goodCond.length) c.push("сайн — " + goodCond.join(", "));
+  if(badCond.length)  c.push("муу буюу онцгой муу — " + badCond.join(", "));
+  if(c.length) P.push("<p><b>Бэлчээрийн нөхцөлийн үнэлгээ.</b> " + c.join("; ") + ".</p>");
+
+  if(highRisk.length || midRisk.length){
+    P.push("<p><b>Ган, зудын эрсдэл.</b> "
+      + (highRisk.length ? "Өндөр эрсдэлтэй: " + highRisk.join(", ") + ". " : "")
+      + (midRisk.length ? "Дунд эрсдэлтэй: " + midRisk.join(", ") + ". " : "")
+      + "Эдгээр сумын малчдад отор нүүдэл, өвс тэжээлийн нөөцийн талаар зөвлөмж хүргүүлэх шаардлагатай.</p>");
+  }
+
+  var missing = SOUMS.filter(function(s){
+    return !data.some(function(r){ return r.soum === s.id; });
+  }).map(function(s){ return s.name; });
+  if(missing.length){
+    P.push("<p><b>Мэдээ дутуу.</b> " + missing.join(", ")
+      + " сумын мэдээ ирээгүй тул дээрх дүгнэлтийг " + data.length + " сумын мэдээгээр хийв.</p>");
+  }
+
+  el.innerHTML = '<p class="hd">' + periodLabel() + "</p>" + P.join("");
+}
+
+/* ===================== мэдэгдэл ===================== */
+function renderNotices(){
+  var h = "";
+  if(dbState === "offline" || dbState === "error" || dbState === "revoked"){
+    h += '<div class="notice offline"><b>Сантай холбогдоогүй.</b>'
+      + "<span>Мэдээ хадгалагдахгүй байна. Хуудсыг нийтэлсэн линкээр нээж, дахин ачаалаад үзнэ үү.</span></div>";
+  }
+  if(isDemo){
+    h += '<div class="notice demo"><b>Жишээ өгөгдөл.</b>'
+      + "<span>Энэ арав хоногийн жинхэнэ мэдээ ороогүй тул хуудас яаж ажилладгийг үзүүлж байна. "
+      + "Эхний сум мэдээгээ оруулмагц жишээ бүрмөсөн алга болно.</span></div>";
+  }
+  document.getElementById("notices").innerHTML = h;
+}
+
+/* ===================== ерөнхий render ===================== */
+function render(){
+  isDemo = (rows.length === 0 && dbState !== "loading");
+  var data = isDemo ? demoRows() : rows;
+
+  document.getElementById("countNum").innerHTML = rows.length + "<small>/14</small>";
+  document.getElementById("countBar").style.width = (rows.length / 14 * 100) + "%";
+  document.getElementById("countLabel").textContent = rows.length === 14
+    ? "Бүх сумын мэдээ бүрдлээ — тоймоо баталгаажуулна уу"
+    : (14 - rows.length) + " сумын мэдээ хүлээгдэж байна";
+  document.getElementById("tableNote").textContent = periodLabel();
+
+  renderNotices();
+  renderTable(data);
+  barChart("chartPrecip", data, {
+    key:"precip", normKey:"precip_norm", unit:"мм", dgt:1,
+    aria:"Сум тус бүрийн хур тунадасны хэмжээ, олон жилийн дундажтай харьцуулсан хэвтээ баганан график"
+  });
+  barChart("chartYield", data, {
+    key:"yield_p", unit:"ц/га", dgt:2,
+    aria:"Сум тус бүрийн бэлчээрийн ургацын хэмжээ, хэвтээ баганан график"
+  });
+  buildSummary(data);
+}
+
+/* ===================== маягт ===================== */
+function optionList(list, sel){
+  return list.map(function(o){
+    return '<option value="' + o.v + '"' + (o.v === sel ? " selected" : "") + ">" + o.label + "</option>";
+  }).join("");
+}
+function fieldNum(id, label, hint, step){
+  return '<div class="f"><label for="' + id + '">' + label + "</label>"
+    + '<input id="' + id + '" type="number" step="' + (step || "0.1") + '" inputmode="decimal">'
+    + (hint ? '<span class="hint">' + hint + "</span>" : "") + "</div>";
+}
+function openForm(){
+  var host = document.getElementById("dialogHost");
+  host.innerHTML =
+    '<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle">'
+    + '<div class="sheet-head"><div><h2 id="shTitle">Сумын арав хоногийн мэдээ</h2>'
+    + "<p>" + periodLabel() + " · нэг суманд нэг мэдээ, дахин оруулбал шинэчилнэ</p></div>"
+    + '<button class="close-x" id="btnClose" aria-label="Хаах">&times;</button></div>'
+
+    + '<div class="sheet-body">'
+    + '<div class="grp"><h4>Ерөнхий</h4><div class="rowgrid">'
+    +   '<div class="f"><label for="fSoum">Сум</label><select id="fSoum">'
+    +     SOUMS.map(function(s){ return '<option value="' + s.id + '">' + s.name + "</option>"; }).join("")
+    +   "</select></div>"
+    +   '<div class="f"><label for="fObs">Мэдээ өгсөн ажиглагч</label><input id="fObs" type="text" placeholder="Овог нэр"></div>'
+    + "</div></div>"
+
+    + '<div class="grp"><h4>Агаарын температур ба тунадас</h4><div class="rowgrid">'
+    +   fieldNum("fTavg", "Дундаж температур, °C")
+    +   fieldNum("fTmax", "Хамгийн их, °C")
+    +   fieldNum("fTmin", "Хамгийн бага, °C")
+    +   fieldNum("fPrecip", "Хур тунадас, мм")
+    +   fieldNum("fNorm", "Олон жилийн дундаж тунадас, мм", "Хэвийн байдлаас хазайлт бодоход хэрэглэнэ")
+    +   fieldNum("fWind", "Салхины хамгийн их хурд, м/с", "", "1")
+    + "</div></div>"
+
+    + '<div class="grp"><h4>Хөрс, цасан бүрхүүл</h4><div class="rowgrid">'
+    +   fieldNum("fMoist", "Хөрсний чийг, % (0–20 см)")
+    +   fieldNum("fStemp", "Хөрсний температур, °C (10 см)")
+    +   fieldNum("fSnow", "Цасан бүрхүүлийн зузаан, см", "", "1")
+    + "</div></div>"
+
+    + '<div class="grp"><h4>Бэлчээр, ургамал</h4><div class="rowgrid">'
+    +   fieldNum("fHeight", "Ургамлын өндөр, см")
+    +   fieldNum("fYield", "Бэлчээрийн ургац, ц/га", "Хатаамал жингээр", "0.01")
+    +   '<div class="f"><label for="fPhase">Хөгжлийн үе шат</label><select id="fPhase">'
+    +     PHASES.map(function(p){ return '<option value="' + p + '">' + p + "</option>"; }).join("")
+    +   "</select></div>"
+    +   '<div class="f"><label for="fCond">Бэлчээрийн нөхцөл</label><select id="fCond">'
+    +     optionList(CONDS, "warning") + "</select></div>"
+    +   '<div class="f"><label for="fRisk">Ган / зудын эрсдэл</label><select id="fRisk">'
+    +     optionList(RISKS, "none") + "</select></div>"
+    + "</div></div>"
+
+    + '<div class="grp"><h4>Тэмдэглэл</h4><div class="rowgrid full"><div class="f">'
+    +   '<textarea id="fNote" placeholder="Онцлох үзэгдэл, малын бэлчээрлэлт, усан хангамжийн байдал…"></textarea>'
+    + "</div></div></div>"
+    + "</div>"
+
+    + '<div class="sheet-foot"><span class="form-msg" id="fMsg"></span>'
+    + '<span style="display:flex;gap:8px"><button id="btnCancel">Болих</button>'
+    + '<button class="primary" id="btnSave">Хадгалах</button></span></div>'
+    + "</div></div>";
+
+  function close(){ host.innerHTML = ""; document.removeEventListener("keydown", onEsc); }
+  function onEsc(e){ if(e.key === "Escape") close(); }
+  document.addEventListener("keydown", onEsc);
+  document.getElementById("btnClose").onclick = close;
+  document.getElementById("btnCancel").onclick = close;
+  document.getElementById("scrim").addEventListener("mousedown", function(e){
+    if(e.target.id === "scrim") close();
+  });
+
+  function set(id, v){ document.getElementById(id).value = (v === null || v === undefined) ? "" : v; }
+  function fill(){
+    var id = document.getElementById("fSoum").value;
+    var r = null;
+    rows.forEach(function(x){ if(x.soum === id) r = x; });
+    set("fTavg", r && r.t_avg); set("fTmax", r && r.t_max); set("fTmin", r && r.t_min);
+    set("fPrecip", r && r.precip); set("fNorm", r && r.precip_norm); set("fWind", r && r.wind_max);
+    set("fMoist", r && r.soil_moist); set("fStemp", r && r.soil_temp); set("fSnow", r && r.snow);
+    set("fHeight", r && r.plant_h); set("fYield", r && r.yield_p);
+    set("fObs", r && r.obs); set("fNote", r && r.note);
+    document.getElementById("fPhase").value = (r && r.phase) ? r.phase : PHASES[0];
+    document.getElementById("fCond").value = (r && r.cond) ? r.cond : "warning";
+    document.getElementById("fRisk").value = (r && r.risk) ? r.risk : "none";
+    var msg = document.getElementById("fMsg");
+    msg.className = "form-msg" + (r ? " ok" : "");
+    msg.textContent = r ? "Энэ сум мэдээгээ өгсөн байна — хадгалбал шинэчилнэ." : "";
+  }
+  document.getElementById("fSoum").onchange = fill;
+  fill();
+  document.getElementById("fSoum").focus();
+
+  document.getElementById("btnSave").onclick = function(){
+    var msg = document.getElementById("fMsg");
+    function g(id){ var v = document.getElementById(id).value.trim(); return v === "" ? null : (+v); }
+    var soum = document.getElementById("fSoum").value;
+    var rec = {
+      period: key(), year: period.y, month: period.m, decade: period.d, soum: soum,
+      t_avg: g("fTavg"), t_max: g("fTmax"), t_min: g("fTmin"),
+      precip: g("fPrecip"), precip_norm: g("fNorm"), wind_max: g("fWind"),
+      soil_moist: g("fMoist"), soil_temp: g("fStemp"), snow: g("fSnow"),
+      plant_h: g("fHeight"), yield_p: g("fYield"),
+      phase: document.getElementById("fPhase").value,
+      cond: document.getElementById("fCond").value,
+      risk: document.getElementById("fRisk").value,
+      obs: document.getElementById("fObs").value.trim(),
+      note: document.getElementById("fNote").value.trim(),
+      at: new Date().toISOString()
+    };
+    if(rec.t_avg === null && rec.precip === null){
+      msg.className = "form-msg";
+      msg.textContent = "Ядаж дундаж температур эсвэл хур тунадасны хэмжээг бөглөнө үү.";
+      return;
+    }
+    if(!db){
+      msg.className = "form-msg";
+      msg.textContent = "Сантай холбогдоогүй тул хадгалах боломжгүй байна.";
+      return;
+    }
+    var btn = document.getElementById("btnSave");
+    btn.disabled = true;
+    btn.textContent = "Хадгалж байна…";
+    db.doc("reports/" + key() + "-" + soum).set(rec).then(function(){
+      close();
+    }).catch(function(e){
+      btn.disabled = false;
+      btn.textContent = "Хадгалах";
+      msg.className = "form-msg";
+      msg.textContent = (e && e.code === "quota_exceeded")
+        ? "Санд зай дүүрчээ. Хуучин арав хоногийн мэдээг цэвэрлэх шаардлагатай."
+        : "Хадгалж чадсангүй. Түр хүлээгээд дахин оролдоно уу.";
+    });
+  };
+}
+
+/* ===================== CSV ===================== */
+function csvText(){
+  var H = ["Сум","Станц","Он","Сар","Арав хоног","t дундаж","t их","t бага","Тунадас мм","ОЖД мм",
+    "Салхи м/с","Хөрсний чийг %","Хөрсний t","Цас см","Ургамлын өндөр см","Ургац ц/га",
+    "Хөгжлийн үе шат","Бэлчээрийн нөхцөл","Ган зуд","Ажиглагч","Тэмдэглэл"];
+  var src = isDemo ? demoRows() : rows;
+  var byId = {};
+  src.forEach(function(r){ byId[r.soum] = r; });
+  function q(v){ return '"' + String(v === null || v === undefined ? "" : v).replace(/"/g, '""') + '"'; }
+  var lines = [H.map(q).join(",")];
+  SOUMS.forEach(function(s){
+    var r = byId[s.id] || {};
+    lines.push([s.name, s.st, period.y, period.m, DEC_ROMAN[period.d],
+      r.t_avg, r.t_max, r.t_min, r.precip, r.precip_norm, r.wind_max,
+      r.soil_moist, r.soil_temp, r.snow, r.plant_h, r.yield_p,
+      r.phase, COND_BY_V[r.cond], RISK_BY_V[r.risk], r.obs, r.note].map(q).join(","));
+  });
+  return "﻿" + lines.join("\r\n");
+}
+
+/* ===================== эхлүүлэлт ===================== */
+(function init(){
+  var ys = document.getElementById("pYear");
+  for(var y = now.getFullYear() + 1; y >= now.getFullYear() - 4; y--){
+    ys.insertAdjacentHTML("beforeend",
+      '<option value="' + y + '"' + (y === period.y ? " selected" : "") + ">" + y + "</option>");
+  }
+  var ms = document.getElementById("pMonth");
+  MONTHS.forEach(function(m, i){
+    ms.insertAdjacentHTML("beforeend",
+      '<option value="' + (i+1) + '"' + ((i+1) === period.m ? " selected" : "") + ">" + m + "</option>");
+  });
+  var ds = document.getElementById("pDec");
+  ds.value = String(period.d);
+
+  function onPeriod(){
+    period = { y: +ys.value, m: +ms.value, d: +ds.value };
+    rows = [];
+    render();
+    subscribe();
+  }
+  ys.onchange = onPeriod; ms.onchange = onPeriod; ds.onchange = onPeriod;
+
+  document.getElementById("btnAdd").onclick = openForm;
+
+  document.getElementById("btnCopy").onclick = function(){
+    var btn = document.getElementById("btnCopy");
+    var text = periodLabel() + "\n\n" + document.getElementById("summary").innerText;
+    function done(t){ btn.textContent = t; setTimeout(function(){ btn.textContent = "Тоймыг хуулах"; }, 1800); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ done("Хуулагдлаа"); })
+        .catch(function(){ done("Хуулж чадсангүй"); });
+    } else { done("Хуулж чадсангүй"); }
+  };
+
+  document.getElementById("btnCsv").onclick = function(){
+    var btn = document.getElementById("btnCsv");
+    function fail(t){ btn.textContent = t; setTimeout(function(){ btn.textContent = "CSV татах"; }, 1800); }
+    if(typeof claude === "undefined" || !claude || !claude.use){ fail("Татах боломжгүй"); return; }
+    claude.use("downloads").then(function(dl){
+      if(!dl){ fail("Татах боломжгүй"); return; }
+      return dl.save({ filename: "umnugovi-haacu-" + key() + ".csv", data: csvText() });
+    }).catch(function(){ fail("Татаагүй"); });
+  };
+
+  render();
+  connect();
+})();
+</script>
