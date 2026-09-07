@@ -373,13 +373,43 @@ table.grid tr.filled td:first-child{padding-left:7px}
 .grid-legend{font-size:11.5px;color:var(--muted);margin-top:10px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
+<style>
+/* ---- станцын бүлэглэсэн хүснэгтийн толгой ---- */
+thead tr.grp-row th{
+  text-align:center;background:var(--surface-2);color:var(--ink-2);
+  border-bottom:1px solid var(--rule);font-size:10px;letter-spacing:.1em;
+  border-left:1px solid var(--rule-strong);
+}
+thead tr.grp-row th:first-child{border-left:none;background:var(--surface)}
+thead tr.f-row th{font-size:10px;letter-spacing:.03em}
+table td.gsep,table th.gsep{border-left:1px solid var(--rule-strong)}
+.stx{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--muted);font-weight:400}
+tbody td.l .stx{display:block}
+.unplaced{
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+  font-size:11px;color:var(--muted);margin-top:8px;
+}
+.unplaced .chip{
+  display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--rule-strong);
+  border-radius:99px;padding:2px 9px;color:var(--ink-2);
+}
+.unplaced .chip b{font-weight:600;font-variant-numeric:tabular-nums}
+.sign-row{
+  display:flex;gap:28px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);
+}
+.sign-row span{white-space:nowrap}
+.todo{
+  border-left:3px solid var(--warning-ink);
+}
+table.grid td.gsep{border-left:1px solid var(--rule-strong)}
+</style>
 
 <div class="wrap">
 
   <header class="masthead">
     <div>
-      <p class="eyebrow">Ус цаг уур, орчны шинжилгээний төв · Хөдөө аж ахуйн цаг уур</p>
-      <h1>Өмнөговь аймаг <span class="thin">— арав хоногийн нэгтгэл</span></h1>
+      <p class="eyebrow">Ус цаг уур, орчны шинжилгээний газар · Хөдөө аж ахуйн цаг уур</p>
+      <h1>Өмнөговь аймаг <span class="thin">— 10 хоногийн нэгтгэл</span></h1>
     </div>
     <div class="period-pick">
       <div class="field">
@@ -391,11 +421,11 @@ table.grid tr.filled td:first-child{padding-left:7px}
         <select id="pMonth"></select>
       </div>
       <div class="field">
-        <label for="pDec">Арав хоног</label>
+        <label for="pDec">10 хоног</label>
         <select id="pDec">
-          <option value="1">I (1–10)</option>
-          <option value="2">II (11–20)</option>
-          <option value="3">III (21–сүүл)</option>
+          <option value="1">01 (1–10)</option>
+          <option value="2">02 (11–20)</option>
+          <option value="3">03 (21–сүүл)</option>
         </select>
       </div>
     </div>
@@ -406,7 +436,7 @@ table.grid tr.filled td:first-child{padding-left:7px}
       <div class="hero-map-head">
         <div>
           <h3 id="mapTitle">Хур тунадас</h3>
-          <p class="sub" id="mapSub">сумын схем зураг</p>
+          <p class="sub" id="mapSub">станцын схем зураг</p>
         </div>
         <div class="map-nav">
           <button class="icon" id="mapPrev" aria-label="Өмнөх үзүүлэлт">&#8249;</button>
@@ -415,23 +445,24 @@ table.grid tr.filled td:first-child{padding-left:7px}
         </div>
       </div>
       <div id="mapBox"></div>
+      <div class="unplaced" id="mapUnplaced"></div>
       <div class="map-legend" id="mapLegend"></div>
     </div>
 
     <div class="hero-text">
-      <p class="eyebrow">Энэ арав хоногийн дүр зураг</p>
+      <p class="eyebrow">Энэ 10 хоногийн дүр зураг</p>
       <p class="lede" id="heroLede">Мэдээ ачаалж байна…</p>
       <dl class="hero-stats" id="heroStats"></dl>
       <div class="progress-block">
         <div class="progress-num" id="countNum">0<small>/14</small></div>
         <div class="progress-meta">
-          <div class="progress-label" id="countLabel">Сумын мэдээ хүлээгдэж байна</div>
+          <div class="progress-label" id="countLabel">Станцын мэдээ хүлээгдэж байна</div>
           <div class="track"><i id="countBar" style="width:0%"></i></div>
         </div>
       </div>
       <div class="actions">
-        <button class="primary" id="btnGrid">14 сумыг дараалуулж бөглөх</button>
-        <button id="btnAdd">Нэг сумын мэдээ</button>
+        <button class="primary" id="btnGrid">14 станцыг дараалуулж бөглөх</button>
+        <button id="btnAdd">Нэг станцын мэдээ</button>
         <button id="btnCsv">CSV татах</button>
         <button id="btnCopy">Тоймыг хуулах</button>
       </div>
@@ -442,27 +473,12 @@ table.grid tr.filled td:first-child{padding-left:7px}
 
   <section>
     <div class="sec-head">
-      <h2>Сум тус бүрийн үзүүлэлт</h2>
+      <h2>Станц тус бүрийн үзүүлэлт</h2>
       <span class="sec-note" id="tableNote"></span>
     </div>
     <div class="table-scroll">
       <table>
-        <thead>
-          <tr>
-            <th class="l">Сум / харуул</th>
-            <th>t° дундаж</th>
-            <th>t° их / бага</th>
-            <th>Тунадас, мм</th>
-            <th>ОЖД-аас</th>
-            <th>Хөрсний чийг, %</th>
-            <th>Цас, см</th>
-            <th>Ургамлын өндөр, см</th>
-            <th>Ургац, ц/га</th>
-            <th class="l">Хөгжлийн үе шат</th>
-            <th class="l">Бэлчээрийн нөхцөл</th>
-            <th class="l">Ган / зуд</th>
-          </tr>
-        </thead>
+        <thead id="thead"></thead>
         <tbody id="tbody"></tbody>
         <tfoot id="tfoot"></tfoot>
       </table>
@@ -472,24 +488,24 @@ table.grid tr.filled td:first-child{padding-left:7px}
   <section>
     <div class="sec-head">
       <h2>Харьцуулалт</h2>
-      <span class="sec-note">Мэдээгээ өгсөн сумууд эрэмбэлэгдэн орлоо</span>
+      <span class="sec-note">Мэдээгээ өгсөн станцууд эрэмбэлэгдэн орлоо</span>
     </div>
     <div class="charts">
       <div class="card">
         <h3>Хур тунадас, мм</h3>
-        <p class="sub">Олон жилийн дундажтай харьцуулав</p>
+        <p class="sub">Олон жилийн дундаж оруулсан бол зураасаар тэмдэглэв</p>
         <div id="chartPrecip"></div>
         <div class="legend-note">
-          <span><i class="swatch"></i> Тайлант арав хоногийн тунадас</span>
+          <span><i class="swatch"></i> Тайлант 10 хоногийн тунадас</span>
           <span><i class="swatch tick"></i> Олон жилийн дундаж</span>
         </div>
       </div>
       <div class="card">
-        <h3>Бэлчээрийн ургац, ц/га</h3>
-        <p class="sub">Хатаамал жинд шилжүүлсэн ургацын хэмжээ</p>
+        <h3>Ургамлын ургац, ц/га</h3>
+        <p class="sub">Бэлчээрийн ургамлын ургацын хэмжээ</p>
         <div id="chartYield"></div>
         <div class="legend-note">
-          <span><i class="swatch"></i> Бэлчээрийн ургац</span>
+          <span><i class="swatch"></i> Ургамлын ургац</span>
         </div>
       </div>
     </div>
@@ -504,7 +520,10 @@ table.grid tr.filled td:first-child{padding-left:7px}
       <div class="summary-body" id="summary"></div>
       <div class="summary-foot">
         <span id="summaryMeta"></span>
-        <span>Хянасан: ХАА-н цаг уурын инженер ____________________</span>
+        <span class="sign-row">
+          <span>Тоовор хийсэн: ......................</span>
+          <span>Шалгасан инженер: ......................</span>
+        </span>
       </div>
     </div>
   </section>
@@ -518,44 +537,91 @@ table.grid tr.filled td:first-child{padding-left:7px}
 <div id="dialogHost"></div>
 
 <script>
-/* ===================== тогтмолууд ===================== */
-var SOUMS = [
-  {id:"bayan_ovoo",   name:"Баян-Овоо",   st:"ХАА-01"},
-  {id:"bayandalai",   name:"Баяндалай",   st:"ХАА-02"},
-  {id:"bulgan",       name:"Булган",      st:"ХАА-03"},
-  {id:"gurvantes",    name:"Гурвантэс",   st:"ХАА-04"},
-  {id:"mandal_ovoo",  name:"Мандал-Овоо", st:"ХАА-05"},
-  {id:"manlai",       name:"Манлай",      st:"ХАА-06"},
-  {id:"noyon",        name:"Ноён",        st:"ХАА-07"},
-  {id:"nomgon",       name:"Номгон",      st:"ХАА-08"},
-  {id:"sevrei",       name:"Сэврэй",      st:"ХАА-09"},
-  {id:"khanbogd",     name:"Ханбогд",     st:"ХАА-10"},
-  {id:"khankhongor",  name:"Ханхонгор",   st:"ХАА-11"},
-  {id:"khurmen",      name:"Хүрмэн",      st:"ХАА-12"},
-  {id:"tsogt_ovoo",   name:"Цогт-Овоо",   st:"ХАА-13"},
-  {id:"tsogttsetsii", name:"Цогтцэций",   st:"ХАА-14"}
+/* ===================== станцууд =====================
+   Индекс ба нэр нь ХААЦУС системийн жагсаалтаас авав.
+   pos — схем зураг дээрх харьцангуй байрлал (0–1). null бол байрлал тодруулаагүй. */
+var STATIONS = [
+  {idx:"339", name:"Сайхан",      pos:null, ask:true},
+  {idx:"347", name:"Цогт-Овоо",   pos:[0.68,0.15]},
+  {idx:"373", name:"Даланзадгад", pos:[0.49,0.62], center:true},
+  {idx:"374", name:"Гурвантэс",   pos:[0.07,0.71]},
+  {idx:"382", name:"Манлай",      pos:[0.80,0.30]},
+  {idx:"385", name:"Ханбогд",     pos:[0.90,0.57]},
+  {idx:"731", name:"Баяндалай",   pos:[0.43,0.77]},
+  {idx:"732", name:"Баян-Овоо",   pos:[0.72,0.49]},
+  {idx:"733", name:"Мандал-Овоо", pos:[0.50,0.24]},
+  {idx:"735", name:"Ноён",        pos:[0.21,0.65]},
+  {idx:"736", name:"Номгон",      pos:[0.76,0.81]},
+  {idx:"737", name:"Сэврэй",      pos:[0.19,0.84]},
+  {idx:"739", name:"739 станц",   pos:null, ask:true},
+  {idx:"740", name:"Цогтцэций",   pos:[0.58,0.36]}
 ];
-var SOUM_BY_ID = {};
-SOUMS.forEach(function(s){ SOUM_BY_ID[s.id] = s; });
+var ST_BY_IDX = {};
+STATIONS.forEach(function(s){ ST_BY_IDX[s.idx] = s; });
 
+/* ===================== талбарууд =====================
+   Гар бичмэл маягтын багануудыг зүүнээс баруун тийш яг тэр дарааллаар. */
+var GROUPS = [
+  {g:"Агаар", f:[
+    {f:"t_avg", h:"Дундаж",    unit:"°C",    dgt:1},
+    {f:"t_max", h:"Макс",      unit:"°C",    dgt:1},
+    {f:"t_min", h:"Мин",       unit:"°C",    dgt:1},
+    {f:"t_d30", h:"30°-аас их","hh":"30°-аас их хоног", unit:"хоног", dgt:0}
+  ]},
+  {g:"Хөрс", f:[
+    {f:"s_avg", h:"Дундаж",    unit:"°C",    dgt:1},
+    {f:"s_max", h:"Макс",      unit:"°C",    dgt:1},
+    {f:"s_min", h:"Мин",       unit:"°C",    dgt:1},
+    {f:"s_d40", h:"40°-аас их","hh":"40°-аас их хоног", unit:"хоног", dgt:0}
+  ]},
+  {g:"Чийг", f:[
+    {f:"rh",    h:"Харьцангуй","hh":"Харьцангуй чийг", unit:"%", dgt:0}
+  ]},
+  {g:"Салхи", f:[
+    {f:"w_max", h:"Их хурд",   unit:"м/с",   dgt:0},
+    {f:"w_d10", h:"10 м/с-ээс их","hh":"10 м/с-ээс их өдөр", unit:"өдөр", dgt:0}
+  ]},
+  {g:"Хур тунадас", f:[
+    {f:"pr",    h:"Хэмжээ",    unit:"мм",    dgt:1},
+    {f:"pr_d",  h:"Өдрийн тоо","hh":"Тунадастай өдрийн тоо", unit:"өдөр", dgt:0}
+  ]},
+  {g:"Ургамал", f:[
+    {f:"pl_h",  h:"Өндөр",     unit:"см",    dgt:1},
+    {f:"pl_c",  h:"Бүрхэц",    unit:"%",     dgt:0},
+    {f:"pl_y",  h:"Ургац",     unit:"ц/га",  dgt:2}
+  ]},
+  {g:"Цас", f:[
+    {f:"sn_d",  h:"Зузаан",    unit:"см",    dgt:0},
+    {f:"sn_b",  h:"Бүрхэц",    unit:"балл",  dgt:0}
+  ]}
+];
+var FIELDS = [];
+GROUPS.forEach(function(g, gi){
+  g.f.forEach(function(c, i){ c.grp = gi; c.first = (i === 0); FIELDS.push(c); });
+});
+var FIELD_BY_KEY = {};
+FIELDS.forEach(function(c){ FIELD_BY_KEY[c.f] = c; });
+
+/* Маягт дээр байхгүй, гэхдээ дүгнэлтэд хэрэгтэй нэмэлт талбарууд. */
 var PHASES = ["Ургалтын идэвхгүй үе","Ногооролт","Навчлалт","Түрүүлэлт","Цэцэглэлт","Үр боловсролт","Хагдрал"];
 var CONDS = [
+  {v:"", label:"— сонгоогүй —"},
   {v:"good", label:"Сайн"},
   {v:"warning", label:"Дунд"},
   {v:"serious", label:"Муу"},
   {v:"critical", label:"Онцгой муу"}
 ];
 var RISKS = [
+  {v:"", label:"— сонгоогүй —"},
   {v:"none", label:"Байхгүй"},
   {v:"good", label:"Бага"},
   {v:"warning", label:"Дунд"},
   {v:"critical", label:"Өндөр"}
 ];
-var COND_BY_V = {}; CONDS.forEach(function(c){ COND_BY_V[c.v] = c.label; });
-var RISK_BY_V = {}; RISKS.forEach(function(r){ RISK_BY_V[r.v] = r.label; });
-var MONTHS = ["1-р сар","2-р сар","3-р сар","4-р сар","5-р сар","6-р сар","7-р сар","8-р сар","9-р сар","10-р сар","11-р сар","12-р сар"];
-var DEC_LABEL = {1:"I (1–10)", 2:"II (11–20)", 3:"III (21–сүүл)"};
-var DEC_ROMAN = {1:"I", 2:"II", 3:"III"};
+var COND_BY_V = {}; CONDS.forEach(function(c){ if(c.v) COND_BY_V[c.v] = c.label; });
+var RISK_BY_V = {}; RISKS.forEach(function(r){ if(r.v) RISK_BY_V[r.v] = r.label; });
+
+var MONTHS = ["01","02","03","04","05","06","07","08","09","10","11","12"];
 
 /* ===================== төлөв ===================== */
 var now = new Date();
@@ -572,51 +638,59 @@ var rows = [];
 var isDemo = false;
 var dbState = "loading";
 
-function key(){ return period.y + "-" + (period.m < 10 ? "0" : "") + period.m + "-" + period.d; }
+function key(){ return period.y + "-" + MONTHS[period.m-1] + "-" + period.d; }
 function num(v){
   if(v === null || v === undefined || v === "") return null;
   var n = +v; return isFinite(n) ? n : null;
 }
 function fmt(v, d){ return (v === null || v === undefined) ? "—" : (+v).toFixed(d === undefined ? 1 : d); }
-function fmt0(v){ return (v === null || v === undefined) ? "—" : String(Math.round(v)); }
 function esc(s){
   return String(s === null || s === undefined ? "" : s)
     .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
+/* ХААЦУС системийн бичиглэл: «2026 оны 08 сарын 01-р 10 хоног» */
 function periodLabel(){
-  return period.y + " оны " + MONTHS[period.m-1] + "ын " + DEC_ROMAN[period.d] + " арав хоног";
+  return period.y + " оны " + MONTHS[period.m-1] + " сарын 0" + period.d + "-р 10 хоног";
 }
+function meanOf(data, f){
+  var xs = [];
+  data.forEach(function(r){ var v = num(r[f]); if(v !== null) xs.push(v); });
+  if(!xs.length) return null;
+  return xs.reduce(function(a,b){ return a+b; }, 0) / xs.length;
+}
+function stName(idx){ return ST_BY_IDX[idx] ? ST_BY_IDX[idx].name : idx; }
 
 /* ===================== жишээ өгөгдөл =====================
    Хоосон үед хуудас юу хийдгийг үзүүлэх зорилготой, ил тод тэмдэглэсэн жишээ.
    Санд хадгалагддаггүй; эхний жинхэнэ мэдээ ормогц бүрмөсөн алга болно. */
 function demoRows(){
   var seed = [
-    ["bayan_ovoo",  17.4, 31.2, 3.6,  6.2, 11.4, 12.8, 0, 6.1, 2.80, "Үр боловсролт", "warning",  "warning"],
-    ["bayandalai",  16.1, 29.8, 2.9,  4.1,  9.8, 10.2, 0, 5.4, 2.20, "Үр боловсролт", "serious",  "warning"],
-    ["bulgan",      18.2, 32.6, 4.8,  9.7, 12.6, 15.4, 0, 7.8, 3.60, "Үр боловсролт", "good",     "good"],
-    ["gurvantes",   15.6, 28.4, 2.2,  2.4, 10.9,  8.6, 0, 4.2, 1.60, "Хагдрал",       "critical", "critical"],
-    ["mandal_ovoo", 17.9, 31.8, 3.9, 11.3, 12.1, 16.9, 0, 8.4, 3.90, "Үр боловсролт", "good",     "good"],
-    ["manlai",      17.1, 30.9, 3.1,  5.6, 11.7, 11.4, 0, 5.9, 2.60, "Үр боловсролт", "warning",  "warning"],
-    ["nomgon",      16.4, 30.1, 2.6,  3.8, 11.2,  9.7, 0, 4.9, 2.00, "Хагдрал",       "serious",  "warning"],
-    ["khanbogd",    18.6, 33.1, 4.2,  7.9, 12.4, 13.6, 0, 6.6, 3.10, "Үр боловсролт", "warning",  "good"],
-    ["khankhongor", 17.7, 31.4, 3.4,  8.6, 11.9, 14.1, 0, 7.1, 3.30, "Үр боловсролт", "good",     "good"]
+    ["347", 22.4, 33, 11, 4, 26.1, 41, 9, 3, 34, 14, 1, 3.2, 2, 4.1, 22, 1.90],
+    ["373", 21.8, 32, 10, 3, 25.4, 39, 8, 2, 36, 12, 1, 5.6, 3, 5.2, 28, 2.40],
+    ["374", 20.6, 31,  9, 2, 24.2, 38, 7, 1, 39, 16, 2, 9.4, 4, 6.8, 34, 3.10],
+    ["382", 22.9, 34, 12, 5, 26.8, 42, 10, 4, 32, 15, 2, 2.8, 2, 3.6, 19, 1.60],
+    ["385", 23.6, 35, 12, 6, 27.4, 43, 11, 5, 31, 13, 1, 2.1, 1, 3.1, 17, 1.40],
+    ["731", 20.9, 31,  9, 2, 24.6, 38, 8, 2, 38, 11, 1, 7.2, 3, 6.1, 31, 2.80],
+    ["732", 22.1, 33, 11, 4, 25.9, 40, 9, 3, 35, 14, 1, 4.3, 2, 4.6, 24, 2.10],
+    ["733", 21.4, 32, 10, 3, 25.1, 39, 8, 2, 37, 12, 1, 8.1, 4, 6.4, 33, 2.95],
+    ["735", 19.8, 30,  8, 1, 23.4, 36, 6, 1, 41, 18, 3, 11.6, 5, 7.4, 38, 3.55],
+    ["736", 22.6, 34, 11, 5, 26.4, 41, 10, 4, 33, 13, 1, 3.7, 2, 3.9, 21, 1.75],
+    ["737", 20.2, 30,  9, 2, 23.9, 37, 7, 1, 40, 17, 2, 10.2, 4, 7.1, 36, 3.30],
+    ["740", 21.1, 32, 10, 3, 24.9, 38, 8, 2, 36, 12, 1, 6.4, 3, 5.7, 29, 2.55]
   ];
+  var keys = ["t_avg","t_max","t_min","t_d30","s_avg","s_max","s_min","s_d40",
+              "rh","w_max","w_d10","pr","pr_d","pl_h","pl_c","pl_y"];
   return seed.map(function(v){
-    return {
-      soum:v[0], t_avg:v[1], t_max:v[2], t_min:v[3], precip:v[4], precip_norm:v[5],
-      soil_moist:v[6], snow:v[7], plant_h:v[8], yield_p:v[9],
-      phase:v[10], cond:v[11], risk:v[12], obs:"жишээ", note:""
-    };
+    var r = { st: v[0], obs: "жишээ" };
+    keys.forEach(function(k, i){ r[k] = v[i+1]; });
+    r.sn_d = 0; r.sn_b = 0;
+    return r;
   });
 }
 
 /* ===================== хадгалалтын холболт =====================
-   Хуудас хоёр орчинд ажиллана:
-     Artifact дээр  → claude.use("db")
-     Сервер дээр    → /api/reports (GoVi server.js)
-   Хоёулаа доорх нэг интерфейсийг хангана: watch / save / byMonth. */
-
+   Artifact дээр claude.use("db"), сервер дээр /api/reports.
+   Хоёулаа watch / save / byMonth гэсэн нэг интерфейсийг хангана. */
 function artifactBackend(db){
   return {
     kind: "artifact",
@@ -626,14 +700,13 @@ function artifactBackend(db){
         onErr
       );
     },
-    save: function(rec){ return db.doc("reports/" + rec.period + "-" + rec.soum).set(rec); },
+    save: function(rec){ return db.doc("reports/" + rec.period + "-" + rec.st).set(rec); },
     byMonth: function(m){
       return db.collection("reports").where("month", "==", m).limit(1000).get()
         .then(function(snap){ return snap.docs.map(function(d){ return d.data(); }).filter(Boolean); });
     }
   };
 }
-
 function api(url, opts){
   opts = opts || {};
   var h = { "Content-Type": "application/json" };
@@ -645,7 +718,6 @@ function api(url, opts){
       return res.json();
     });
 }
-
 function httpBackend(){
   return {
     kind: "http",
@@ -664,23 +736,18 @@ function httpBackend(){
     byMonth: function(m){ return api("/api/reports?month=" + m); }
   };
 }
-
 function connect(){
   probeArtifact().then(function(b){
-    if(b){
-      store = b; storeInfo.kind = "artifact"; dbState = "ok"; subscribe(); return;
-    }
+    if(b){ store = b; storeInfo.kind = "artifact"; dbState = "ok"; subscribe(); return; }
     return probeHttp();
   }).catch(function(){ dbState = "offline"; render(); });
 }
-
 function probeArtifact(){
   if(typeof claude === "undefined" || !claude || !claude.use) return Promise.resolve(null);
   return claude.use("db")
     .then(function(d){ return d ? artifactBackend(d) : null; })
     .catch(function(){ return null; });
 }
-
 function probeHttp(){
   if(typeof fetch !== "function"){ dbState = "offline"; render(); return Promise.resolve(); }
   return fetch("/api/config")
@@ -696,7 +763,6 @@ function probeHttp(){
     })
     .catch(function(){ dbState = "offline"; render(); });
 }
-
 function needCode(){
   accessCode = "";
   try { localStorage.removeItem("govi_code"); } catch(e){}
@@ -705,7 +771,6 @@ function needCode(){
   render();
   askCode();
 }
-
 function subscribe(){
   if(unsub){ try{ unsub(); }catch(e){} unsub = null; }
   if(!store) return;
@@ -727,7 +792,6 @@ function subscribe(){
     }
   );
 }
-
 function askCode(){
   var host = document.getElementById("dialogHost");
   host.innerHTML =
@@ -739,7 +803,6 @@ function askCode(){
     + '<span class="hint">Кодыг энэ төхөөрөмжид цээжилнэ.</span></div></div>'
     + '<div class="sheet-foot"><span class="form-msg" id="cMsg"></span>'
     + '<button class="primary" id="cGo">Нэвтрэх</button></div></div></div>';
-
   var input = document.getElementById("cCode");
   input.focus();
   function go(){
@@ -764,58 +827,49 @@ function askCode(){
 }
 
 /* ===================== хүснэгт ===================== */
-function devCell(r){
-  var p = num(r.precip), n = num(r.precip_norm);
-  if(p === null || n === null || n === 0) return "<td>—</td>";
-  var pct = Math.round(p / n * 100);
-  var cls = pct < 80 ? " dry" : (pct > 120 ? " wet" : "");
-  return '<td><span class="dev' + cls + '">' + pct + "%</span></td>";
-}
-function pill(v, map){
-  if(!v || !map[v]) return '<span class="pill none">—</span>';
-  if(v === "none") return '<span class="pill none">' + map[v] + "</span>";
-  return '<span class="pill ' + v + '"><i></i>' + map[v] + "</span>";
-}
-function meanOf(data, f){
-  var xs = [];
-  data.forEach(function(r){ var v = num(r[f]); if(v !== null) xs.push(v); });
-  if(!xs.length) return null;
-  return xs.reduce(function(a,b){ return a+b; }, 0) / xs.length;
+function renderHead(){
+  var g1 = '<tr class="grp-row"><th class="l" rowspan="2">Салбар</th>';
+  GROUPS.forEach(function(g){
+    g1 += '<th colspan="' + g.f.length + '">' + g.g + "</th>";
+  });
+  g1 += "</tr>";
+  var g2 = '<tr class="f-row">';
+  FIELDS.forEach(function(c){
+    g2 += "<th" + (c.first ? ' class="gsep"' : "") + ' title="' + esc(c.hh || c.h) + '">'
+       + c.h + (c.unit ? '<br><span style="font-weight:400;text-transform:none;letter-spacing:0">'
+       + c.unit + "</span>" : "") + "</th>";
+  });
+  g2 += "</tr>";
+  document.getElementById("thead").innerHTML = g1 + g2;
 }
 function renderTable(data){
   var byId = {};
-  data.forEach(function(r){ byId[r.soum] = r; });
+  data.forEach(function(r){ byId[r.st] = r; });
 
-  document.getElementById("tbody").innerHTML = SOUMS.map(function(s){
-    var r = byId[s.id];
-    var head = '<td class="l"><span class="soum">' + s.name + '</span><span class="station">' + s.st + "</span></td>";
+  document.getElementById("tbody").innerHTML = STATIONS.map(function(s){
+    var r = byId[s.idx];
+    var head = '<td class="l"><span class="soum">' + s.name + '</span><span class="stx">'
+             + s.idx + (s.center ? " · аймгийн төв" : "") + "</span></td>";
     if(!r){
-      return '<tr class="missing">' + head + '<td colspan="11" class="l await">Мэдээ хүлээгдэж байна</td></tr>';
+      return '<tr class="missing">' + head
+        + '<td colspan="' + FIELDS.length + '" class="l await">Мэдээ хүлээгдэж байна</td></tr>';
     }
-    return "<tr>" + head
-      + "<td>" + fmt(num(r.t_avg)) + "</td>"
-      + "<td>" + fmt(num(r.t_max)) + " / " + fmt(num(r.t_min)) + "</td>"
-      + "<td>" + fmt(num(r.precip)) + "</td>"
-      + devCell(r)
-      + "<td>" + fmt(num(r.soil_moist)) + "</td>"
-      + "<td>" + fmt0(num(r.snow)) + "</td>"
-      + "<td>" + fmt(num(r.plant_h)) + "</td>"
-      + "<td>" + fmt(num(r.yield_p), 2) + "</td>"
-      + '<td class="l">' + esc(r.phase || "—") + "</td>"
-      + '<td class="l">' + pill(r.cond, COND_BY_V) + "</td>"
-      + '<td class="l">' + pill(r.risk, RISK_BY_V) + "</td>"
-      + "</tr>";
+    var tds = "";
+    FIELDS.forEach(function(c){
+      tds += "<td" + (c.first ? ' class="gsep"' : "") + ">" + fmt(num(r[c.f]), c.dgt) + "</td>";
+    });
+    return "<tr>" + head + tds + "</tr>";
   }).join("");
 
-  document.getElementById("tfoot").innerHTML = !data.length ? "" :
-    '<tr><td class="l">Аймгийн дундаж · ' + data.length + " сум</td>"
-    + "<td>" + fmt(meanOf(data,"t_avg")) + "</td><td>—</td>"
-    + "<td>" + fmt(meanOf(data,"precip")) + "</td><td>—</td>"
-    + "<td>" + fmt(meanOf(data,"soil_moist")) + "</td>"
-    + "<td>" + fmt0(meanOf(data,"snow")) + "</td>"
-    + "<td>" + fmt(meanOf(data,"plant_h")) + "</td>"
-    + "<td>" + fmt(meanOf(data,"yield_p"), 2) + "</td>"
-    + '<td colspan="3"></td></tr>';
+  var tf = "";
+  if(data.length){
+    tf = '<tr><td class="l">Аймгийн дундаж · ' + data.length + " станц</td>";
+    FIELDS.forEach(function(c){
+      tf += "<td" + (c.first ? ' class="gsep"' : "") + ">" + fmt(meanOf(data, c.f), c.dgt) + "</td>";
+    });
+    tf += "</tr>";
+  }
+  document.getElementById("tfoot").innerHTML = tf;
 }
 
 /* ===================== графикууд ===================== */
@@ -833,11 +887,7 @@ function barChart(hostId, data, opt){
   data.forEach(function(r){
     var v = num(r[opt.key]);
     if(v === null) return;
-    items.push({
-      name: SOUM_BY_ID[r.soum] ? SOUM_BY_ID[r.soum].name : r.soum,
-      v: v,
-      n: opt.normKey ? num(r[opt.normKey]) : null
-    });
+    items.push({ name: stName(r.st), v: v, n: opt.normKey ? num(r[opt.normKey]) : null });
   });
   items.sort(function(a,b){ return b.v - a.v; });
 
@@ -845,7 +895,6 @@ function barChart(hostId, data, opt){
     host.innerHTML = '<p class="empty-chart">Мэдээ ороогүй тул график зурагдаагүй байна</p>';
     return;
   }
-
   var W = 560, GL = 108, GR = 54, rowH = 25, barH = 12, top = 20, bot = 28;
   var plotW = W - GL - GR;
   var H = top + items.length * rowH + bot;
@@ -853,38 +902,38 @@ function barChart(hostId, data, opt){
   items.forEach(function(d){ peak = Math.max(peak, d.v, d.n || 0); });
   var maxV = niceMax(peak);
   var x = function(v){ return GL + (v / maxV) * plotW; };
-  var ticks = [0, maxV/4, maxV/2, maxV*3/4, maxV];
-
   var svg = "";
-  ticks.forEach(function(t){
+  [0, maxV/4, maxV/2, maxV*3/4, maxV].forEach(function(t){
     var px = x(t).toFixed(1);
     svg += '<line x1="' + px + '" y1="' + top + '" x2="' + px + '" y2="' + (H-bot) + '" stroke="var(--rule)" stroke-width="1"/>'
         +  '<text x="' + px + '" y="' + (H-bot+15) + '" text-anchor="middle" font-size="10" fill="var(--muted)" '
         +  'font-family="IBM Plex Sans, sans-serif">' + (+t.toFixed(1)) + "</text>";
   });
-
   items.forEach(function(d, i){
     var y = top + i * rowH;
     var w = Math.max(2, x(d.v) - GL);
-    svg += '<g class="brow" data-name="' + esc(d.name) + '" data-v="' + d.v + '" data-n="' + (d.n === null ? "" : d.n) + '" data-cy="' + (y + rowH/2) + '">'
+    svg += '<g class="brow" data-name="' + esc(d.name) + '" data-v="' + d.v + '" data-n="'
+        +  (d.n === null ? "" : d.n) + '" data-cy="' + (y + rowH/2) + '">'
         +  '<rect x="0" y="' + y + '" width="' + W + '" height="' + rowH + '" fill="transparent"/>'
-        +  '<text x="' + (GL-10) + '" y="' + (y + rowH/2 + 4) + '" text-anchor="end" font-size="11.5" fill="var(--ink-2)" '
-        +  'font-family="IBM Plex Sans, sans-serif">' + esc(d.name) + "</text>"
-        +  '<rect x="' + GL + '" y="' + (y + (rowH-barH)/2) + '" width="' + w.toFixed(1) + '" height="' + barH + '" rx="4" fill="var(--bar)"/>'
-        +  '<text x="' + (GL + w + 8).toFixed(1) + '" y="' + (y + rowH/2 + 4) + '" font-size="11.5" fill="var(--ink)" '
-        +  'font-family="IBM Plex Sans, sans-serif" style="font-variant-numeric:tabular-nums">' + (+d.v.toFixed(opt.dgt || 1)) + "</text>";
+        +  '<text x="' + (GL-10) + '" y="' + (y + rowH/2 + 4) + '" text-anchor="end" font-size="11.5" '
+        +  'fill="var(--ink-2)" font-family="IBM Plex Sans, sans-serif">' + esc(d.name) + "</text>"
+        +  '<rect x="' + GL + '" y="' + (y + (rowH-barH)/2) + '" width="' + w.toFixed(1) + '" height="'
+        +  barH + '" rx="4" fill="var(--bar)"/>'
+        +  '<text x="' + (GL + w + 8).toFixed(1) + '" y="' + (y + rowH/2 + 4) + '" font-size="11.5" '
+        +  'fill="var(--ink)" font-family="IBM Plex Sans, sans-serif" '
+        +  'style="font-variant-numeric:tabular-nums">' + (+d.v.toFixed(opt.dgt || 1)) + "</text>";
     if(d.n !== null && d.n > 0 && d.n <= maxV){
-      svg += '<rect x="' + (x(d.n)-1).toFixed(1) + '" y="' + (y + (rowH-barH)/2 - 3) + '" width="2" height="' + (barH+6) + '" fill="var(--ink-2)"/>';
+      svg += '<rect x="' + (x(d.n)-1).toFixed(1) + '" y="' + (y + (rowH-barH)/2 - 3) + '" width="2" height="'
+          +  (barH+6) + '" fill="var(--ink-2)"/>';
     }
     svg += "</g>";
   });
-
   svg += '<line x1="' + GL + '" y1="' + top + '" x2="' + GL + '" y2="' + (H-bot) + '" stroke="var(--rule-strong)" stroke-width="1"/>'
       +  '<text x="' + (W-GR+4) + '" y="' + (H-bot+15) + '" font-size="10" fill="var(--muted)" '
       +  'font-family="IBM Plex Sans, sans-serif">' + opt.unit + "</text>";
 
-  host.innerHTML = '<svg class="chart-svg" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(opt.aria) + '">'
-    + svg + "</svg><div class=\"tip\"></div>";
+  host.innerHTML = '<svg class="chart-svg" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="'
+    + esc(opt.aria) + '">' + svg + '</svg><div class="tip"></div>';
 
   var tip = host.querySelector(".tip");
   var svgEl = host.querySelector("svg");
@@ -907,170 +956,112 @@ function barChart(hostId, data, opt){
 }
 
 /* ===================== hero: схем зураг =====================
-   Сумуудын БОДИТ хилийн зураг биш — харьцангуй байрлалыг нь тусгасан схем.
-   Жинхэнэ GeoJSON гарвал MAP_POS-ын оронд хилийн замуудыг зурна. */
-var MAP_POS = {
-  bulgan:       [0.44, 0.07],
-  tsogt_ovoo:   [0.68, 0.15],
-  mandal_ovoo:  [0.50, 0.24],
-  manlai:       [0.80, 0.30],
-  tsogttsetsii: [0.58, 0.36],
-  bayan_ovoo:   [0.72, 0.49],
-  khanbogd:     [0.90, 0.57],
-  khankhongor:  [0.61, 0.56],
-  khurmen:      [0.30, 0.51],
-  nomgon:       [0.76, 0.81],
-  bayandalai:   [0.43, 0.77],
-  noyon:        [0.21, 0.65],
-  sevrei:       [0.19, 0.84],
-  gurvantes:    [0.07, 0.71]
-};
-var CENTER_POS = [0.49, 0.62]; // Даланзадгад — аймгийн төв станц
-
+   Станцын БОДИТ хилийн зураг биш — харьцангуй байрлалыг тусгасан схем. */
 var MAP_VIEWS = [
-  {key:"precip",     label:"Хур тунадас",       unit:"мм",   dgt:1, type:"seq"},
-  {key:"yield_p",    label:"Бэлчээрийн ургац",  unit:"ц/га", dgt:1, type:"seq"},
-  {key:"soil_moist", label:"Хөрсний чийг",      unit:"%",    dgt:1, type:"seq"},
-  {key:"cond",       label:"Бэлчээрийн нөхцөл", unit:"",     dgt:0, type:"status"}
+  {key:"pr",    label:"Хур тунадас",     unit:"мм",   dgt:1},
+  {key:"t_avg", label:"Агаарын дундаж",  unit:"°C",   dgt:1},
+  {key:"pl_y",  label:"Ургамлын ургац",  unit:"ц/га", dgt:1},
+  {key:"pl_c",  label:"Ургамлын бүрхэц", unit:"%",    dgt:0}
 ];
 var mapView = 0, mapTimer = null, mapPaused = false;
 
 function seqStep(v, lo, hi){
   if(hi <= lo) return 3;
-  var t = (v - lo) / (hi - lo);
-  return Math.max(1, Math.min(5, Math.floor(t * 5) + 1));
+  return Math.max(1, Math.min(5, Math.floor((v - lo) / (hi - lo) * 5) + 1));
 }
-function shortCond(v){
-  return v === "critical" ? "Онц муу" : (COND_BY_V[v] || "—");
-}
-
 function renderMap(data){
-  var box = document.getElementById("mapBox");
   var view = MAP_VIEWS[mapView];
   var byId = {};
-  data.forEach(function(r){ byId[r.soum] = r; });
+  data.forEach(function(r){ byId[r.st] = r; });
 
   document.getElementById("mapTitle").textContent = view.label;
   var have = 0;
-  SOUMS.forEach(function(s){
-    var r = byId[s.id];
-    if(r && (view.type === "status" ? !!r[view.key] : num(r[view.key]) !== null)) have++;
+  STATIONS.forEach(function(s){
+    var r = byId[s.idx];
+    if(r && num(r[view.key]) !== null) have++;
   });
   document.getElementById("mapSub").textContent =
-    "сумын схем зураг · " + have + " сумын мэдээгээр" + (view.unit ? " · " + view.unit : "");
+    "станцын схем зураг · " + have + " станцын мэдээгээр · " + view.unit;
 
-  var lo = 0, hi = 0;
-  if(view.type === "seq"){
-    var vals = [];
-    SOUMS.forEach(function(s){
-      var r = byId[s.id];
-      var v = r ? num(r[view.key]) : null;
-      if(v !== null) vals.push(v);
-    });
-    if(vals.length){ lo = Math.min.apply(null, vals); hi = Math.max.apply(null, vals); }
-  }
+  var vals = [];
+  STATIONS.forEach(function(s){
+    var r = byId[s.idx];
+    var v = r ? num(r[view.key]) : null;
+    if(v !== null) vals.push(v);
+  });
+  var lo = vals.length ? Math.min.apply(null, vals) : 0;
+  var hi = vals.length ? Math.max.apply(null, vals) : 0;
 
   var W = 560, H = 400, PX = 46, PY = 34;
   var X = function(u){ return PX + u * (W - PX*2); };
   var Y = function(u){ return PY + u * (H - PY*2); };
 
-  var svg = '<defs></defs>';
-  // аймгийн хүрээ — зөвхөн орон зайн сануулга, хил биш
-  svg += '<rect x="14" y="12" width="' + (W-28) + '" height="' + (H-24) + '" rx="10" '
-      +  'fill="none" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 5"/>';
+  var svg = '<rect x="14" y="12" width="' + (W-28) + '" height="' + (H-24) + '" rx="10" '
+          + 'fill="none" stroke="var(--rule)" stroke-width="1" stroke-dasharray="3 5"/>';
 
-  // Даланзадгад — аймгийн төв
-  var cx0 = X(CENTER_POS[0]), cy0 = Y(CENTER_POS[1]);
-  svg += '<g><path d="M' + (cx0-6) + ' ' + cy0 + ' L' + cx0 + ' ' + (cy0-6)
-      +  ' L' + (cx0+6) + ' ' + cy0 + ' L' + cx0 + ' ' + (cy0+6) + ' Z" '
-      +  'fill="var(--ink-2)"/>'
-      +  '<text x="' + cx0 + '" y="' + (cy0+18) + '" text-anchor="middle" font-size="9.5" '
-      +  'fill="var(--muted)" font-family="IBM Plex Sans, sans-serif">Даланзадгад</text></g>';
-
-  SOUMS.forEach(function(s){
-    var pos = MAP_POS[s.id];
-    if(!pos) return;
-    var cx = X(pos[0]), cy = Y(pos[1]);
-    var r = byId[s.id];
-    var fill = "none", ink = "var(--muted)", inner = "", sub = "", ring = "var(--rule-strong)";
+  STATIONS.forEach(function(s){
+    if(!s.pos) return;
+    var cx = X(s.pos[0]), cy = Y(s.pos[1]);
+    var r = byId[s.idx];
+    var v = r ? num(r[view.key]) : null;
+    var fill = "none", ink = "var(--muted)", ring = "var(--rule-strong)", inner = "";
     var dash = ' stroke-dasharray="2 3"';
-    var tipVal = "мэдээ ирээгүй";
-
-    if(view.type === "seq"){
-      var v = r ? num(r[view.key]) : null;
-      if(v !== null){
-        var st = seqStep(v, lo, hi);
-        fill = "var(--seq" + st + ")";
-        ink = "var(--seqi" + st + ")";
-        ring = "var(--surface)";
-        dash = "";
-        inner = (+v.toFixed(view.dgt));
-        tipVal = (+v.toFixed(2)) + " " + view.unit;
-      }
-    } else {
-      var c = r ? r[view.key] : null;
-      if(c && COND_BY_V[c]){
-        fill = "var(--" + (c === "good" ? "good" : c === "warning" ? "warning"
-              : c === "serious" ? "serious" : "critical") + "-map)";
-        ring = "var(--surface)";
-        dash = "";
-        sub = shortCond(c);
-        tipVal = COND_BY_V[c];
-      }
+    if(v !== null){
+      var st = seqStep(v, lo, hi);
+      fill = "var(--seq" + st + ")";
+      ink = "var(--seqi" + st + ")";
+      ring = "var(--surface)";
+      dash = "";
+      inner = (+v.toFixed(view.dgt));
     }
-
-    svg += '<g class="msoum" data-name="' + esc(s.name) + '" data-v="' + esc(tipVal) + '">'
-        +  '<circle cx="' + cx + '" cy="' + cy + '" r="15" fill="' + fill + '" '
-        +  'stroke="' + ring + '" stroke-width="2"' + dash + '/>';
+    svg += '<g><circle cx="' + cx + '" cy="' + cy + '" r="15" fill="' + fill + '" stroke="'
+        +  ring + '" stroke-width="2"' + dash + "/>";
     if(inner !== ""){
       svg += '<text x="' + cx + '" y="' + (cy+3.5) + '" text-anchor="middle" font-size="10" '
           +  'font-weight="600" fill="' + ink + '" font-family="IBM Plex Sans, sans-serif" '
           +  'style="font-variant-numeric:tabular-nums">' + inner + "</text>";
     }
-    svg += '<text x="' + cx + '" y="' + (cy+27) + '" text-anchor="middle" font-size="9.5" '
-        +  'fill="var(--ink-2)" font-family="IBM Plex Sans, sans-serif">' + s.name + "</text>";
-    if(sub){
-      svg += '<text x="' + cx + '" y="' + (cy+37) + '" text-anchor="middle" font-size="9" '
-          +  'font-weight="600" fill="var(--ink-2)" font-family="IBM Plex Sans, sans-serif">' + sub + "</text>";
+    if(s.center){
+      svg += '<circle cx="' + cx + '" cy="' + cy + '" r="20" fill="none" stroke="var(--ink-2)" '
+          +  'stroke-width="1" stroke-dasharray="2 3"/>';
     }
-    svg += "</g>";
+    svg += '<text x="' + cx + '" y="' + (cy+28) + '" text-anchor="middle" font-size="9.5" '
+        +  'fill="var(--ink-2)" font-family="IBM Plex Sans, sans-serif">' + s.name + "</text></g>";
   });
 
-  box.innerHTML = '<svg class="map-svg" viewBox="0 0 ' + W + " " + H + '" role="img" '
-    + 'aria-label="' + esc(view.label + " — Өмнөговь аймгийн 14 сумын схем зураг") + '">'
-    + svg + "</svg>";
+  document.getElementById("mapBox").innerHTML =
+    '<svg class="map-svg" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="'
+    + esc(view.label + " — Өмнөговь аймгийн станцуудын схем зураг") + '">' + svg + "</svg>";
 
-  // тайлбар
-  var lg = document.getElementById("mapLegend");
-  if(view.type === "seq"){
-    var ramp = "";
-    for(var i=1;i<=5;i++) ramp += '<i style="background:var(--seq'+i+')"></i>';
-    lg.innerHTML = '<span>' + (lo === hi ? (+lo.toFixed(view.dgt)) : (+lo.toFixed(view.dgt))) + "</span>"
-      + '<span class="ramp">' + ramp + "</span>"
-      + "<span>" + (+hi.toFixed(view.dgt)) + " " + view.unit + "</span>"
-      + '<span style="margin-left:auto">Тойрог доторх тоо = утга</span>';
-  } else {
-    lg.innerHTML = CONDS.map(function(c){
-      return '<span class="st"><i style="background:var(--' + (c.v === "critical" ? "critical" : c.v) + '-map)"></i>'
-           + (c.v === "critical" ? "Онц муу" : c.label) + "</span>";
-    }).join("") + '<span style="margin-left:auto">Мэдээ ирээгүй нь тасархай хүрээтэй</span>';
-  }
+  var un = STATIONS.filter(function(s){ return !s.pos; });
+  document.getElementById("mapUnplaced").innerHTML = !un.length ? "" :
+    "<span>Байрлал тодруулаагүй:</span>" + un.map(function(s){
+      var r = byId[s.idx];
+      var v = r ? num(r[view.key]) : null;
+      return '<span class="chip"><b>' + s.idx + "</b>" + s.name
+           + (v === null ? "" : " · " + (+v.toFixed(view.dgt)) + " " + view.unit) + "</span>";
+    }).join("");
 
-  var dots = document.getElementById("mapDots");
-  dots.innerHTML = MAP_VIEWS.map(function(v, i){
-    return '<b class="' + (i === mapView ? "on" : "") + '" role="button" tabindex="0" '
-         + 'data-i="' + i + '" title="' + v.label + '" aria-label="' + v.label + '"></b>';
+  var ramp = "";
+  for(var i=1;i<=5;i++) ramp += '<i style="background:var(--seq'+i+')"></i>';
+  document.getElementById("mapLegend").innerHTML =
+    "<span>" + (+lo.toFixed(view.dgt)) + "</span>"
+    + '<span class="ramp">' + ramp + "</span>"
+    + "<span>" + (+hi.toFixed(view.dgt)) + " " + view.unit + "</span>"
+    + '<span style="margin-left:auto">Тойрог доторх тоо = утга · тасархай хүрээ = мэдээгүй</span>';
+
+  document.getElementById("mapDots").innerHTML = MAP_VIEWS.map(function(v, i){
+    return '<b class="' + (i === mapView ? "on" : "") + '" role="button" tabindex="0" data-i="'
+         + i + '" title="' + v.label + '" aria-label="' + v.label + '"></b>';
   }).join("");
 }
-
 function setMapView(i){
   mapView = (i + MAP_VIEWS.length) % MAP_VIEWS.length;
   renderMap(isDemo ? demoRows() : rows);
 }
 function startMapCycle(){
   if(mapTimer) clearInterval(mapTimer);
-  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if(reduce) return;
+  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   mapTimer = setInterval(function(){
     if(!mapPaused && !document.getElementById("dialogHost").firstChild) setMapView(mapView + 1);
   }, 7000);
@@ -1080,131 +1071,126 @@ function startMapCycle(){
 function renderHero(data){
   var lede = document.getElementById("heroLede");
   var stats = document.getElementById("heroStats");
-
   if(!data.length){
-    lede.innerHTML = "Энэ арав хоногийн мэдээ хараахан ирээгүй байна.";
+    lede.innerHTML = "Энэ 10 хоногийн мэдээ хараахан ирээгүй байна.";
     stats.innerHTML = "";
     return;
   }
-
-  var pAvg = meanOf(data, "precip");
-  var tAvg = meanOf(data, "t_avg");
-  var yAvg = meanOf(data, "yield_p");
-  var withNorm = data.filter(function(r){ return num(r.precip) !== null && num(r.precip_norm) > 0; });
+  var pAvg = meanOf(data, "pr");
+  var withNorm = data.filter(function(r){ return num(r.pr) !== null && num(r.pr_norm) > 0; });
   var normPct = null;
   if(withNorm.length){
     normPct = Math.round(withNorm.reduce(function(a,r){
-      return a + num(r.precip)/num(r.precip_norm); }, 0) / withNorm.length * 100);
+      return a + num(r.pr)/num(r.pr_norm); }, 0) / withNorm.length * 100);
   }
-  var risky = data.filter(function(r){ return r.risk === "critical" || r.cond === "critical"; });
-
-  var line = "<b>" + data.length + " сумын мэдээгээр</b> аймгийн дундаж тунадас <b>"
+  var line = "<b>" + data.length + " станцын мэдээгээр</b> аймгийн дундаж тунадас <b>"
     + fmt(pAvg) + " мм</b>";
-  if(normPct !== null){
-    line += " — олон жилийн дунджийн <b>" + normPct + "%</b>"
-         + (normPct < 80 ? ", хэвийнээс бага." : (normPct > 120 ? ", хэвийнээс их." : "."));
-  } else { line += "."; }
+  line += normPct !== null
+    ? " — олон жилийн дунджийн <b>" + normPct + "%</b>"
+      + (normPct < 80 ? ", хэвийнээс бага." : (normPct > 120 ? ", хэвийнээс их." : "."))
+    : ", агаарын дундаж температур <b>" + fmt(meanOf(data,"t_avg")) + "°C</b>.";
   lede.innerHTML = line;
 
-  var riskText = risky.length
-    ? risky.map(function(r){ return SOUM_BY_ID[r.soum] ? SOUM_BY_ID[r.soum].name : r.soum; }).join(", ")
-    : "Байхгүй";
-
+  var hotDays = meanOf(data, "t_d30");
   stats.innerHTML =
-      "<div><dt>Дундаж температур</dt><dd>" + fmt(tAvg) + "<small>°C</small></dd></div>"
-    + "<div><dt>Бэлчээрийн ургац</dt><dd>" + fmt(yAvg, 2) + "<small>ц/га</small></dd></div>"
-    + "<div><dt>Хөрсний чийг</dt><dd>" + fmt(meanOf(data, "soil_moist")) + "<small>%</small></dd></div>"
-    + '<div><dt>Онцгой анхаарах сум</dt><dd class="q">' + esc(riskText) + "</dd></div>";
+      "<div><dt>Агаарын дундаж</dt><dd>" + fmt(meanOf(data,"t_avg")) + "<small>°C</small></dd></div>"
+    + "<div><dt>Харьцангуй чийг</dt><dd>" + fmt(meanOf(data,"rh"), 0) + "<small>%</small></dd></div>"
+    + "<div><dt>Ургамлын ургац</dt><dd>" + fmt(meanOf(data,"pl_y"), 2) + "<small>ц/га</small></dd></div>"
+    + "<div><dt>30°-аас их хоног</dt><dd>" + fmt(hotDays, 1) + "<small>хоног</small></dd></div>";
 }
 
 /* ===================== тойм ===================== */
-function nm(id){ return SOUM_BY_ID[id] ? SOUM_BY_ID[id].name : id; }
-
 function buildSummary(data){
   var el = document.getElementById("summary");
-  var meta = document.getElementById("summaryMeta");
-  meta.textContent = periodLabel() + " · " + data.length + "/14 сумын мэдээгээр";
+  document.getElementById("summaryMeta").textContent =
+    periodLabel() + " · " + data.length + "/" + STATIONS.length + " станцын мэдээгээр";
 
   if(!data.length){
     el.innerHTML = '<p class="hd">' + periodLabel() + "</p>"
-      + "<p>Энэ арав хоногийн мэдээ хараахан ирээгүй байна. Сумын харуулууд мэдээгээ оруулмагц "
+      + "<p>Энэ 10 хоногийн мэдээ хараахан ирээгүй байна. Станцууд мэдээгээ оруулмагц "
       + "тойм автоматаар боловсрогдож, доор бэлэн болно.</p>";
     return;
   }
-
-  var tAvg = meanOf(data,"t_avg"), pAvg = meanOf(data,"precip");
-  var withP = data.filter(function(r){ return num(r.precip) !== null; })
-                  .sort(function(a,b){ return num(b.precip) - num(a.precip); });
-  var withNorm = data.filter(function(r){ return num(r.precip) !== null && num(r.precip_norm) > 0; });
+  var withP = data.filter(function(r){ return num(r.pr) !== null; })
+                  .sort(function(a,b){ return num(b.pr) - num(a.pr); });
+  var withNorm = data.filter(function(r){ return num(r.pr) !== null && num(r.pr_norm) > 0; });
   var normPct = null;
   if(withNorm.length){
     normPct = Math.round(withNorm.reduce(function(a,r){
-      return a + num(r.precip)/num(r.precip_norm); }, 0) / withNorm.length * 100);
+      return a + num(r.pr)/num(r.pr_norm); }, 0) / withNorm.length * 100);
   }
-  var below = withNorm.filter(function(r){ return num(r.precip)/num(r.precip_norm) < 0.8; })
-                      .map(function(r){ return nm(r.soum); });
-  var snowy = data.filter(function(r){ return num(r.snow) > 0; })
-                  .map(function(r){ return nm(r.soum) + " (" + fmt0(num(r.snow)) + " см)"; });
-  var badCond = data.filter(function(r){ return r.cond === "serious" || r.cond === "critical"; })
-                    .map(function(r){ return nm(r.soum); });
-  var goodCond = data.filter(function(r){ return r.cond === "good"; }).map(function(r){ return nm(r.soum); });
-  var highRisk = data.filter(function(r){ return r.risk === "critical"; }).map(function(r){ return nm(r.soum); });
-  var midRisk = data.filter(function(r){ return r.risk === "warning"; }).map(function(r){ return nm(r.soum); });
-
-  var phaseCount = {};
-  data.forEach(function(r){ if(r.phase) phaseCount[r.phase] = (phaseCount[r.phase] || 0) + 1; });
-  var topPhase = Object.keys(phaseCount).sort(function(a,b){ return phaseCount[b] - phaseCount[a]; })[0];
+  var below = withNorm.filter(function(r){ return num(r.pr)/num(r.pr_norm) < 0.8; })
+                      .map(function(r){ return stName(r.st); });
+  var snowy = data.filter(function(r){ return num(r.sn_d) > 0; })
+                  .map(function(r){ return stName(r.st) + " (" + fmt(num(r.sn_d), 0) + " см)"; });
+  var windy = data.filter(function(r){ return num(r.w_d10) > 0; })
+                  .sort(function(a,b){ return num(b.w_d10) - num(a.w_d10); });
+  var hot = data.filter(function(r){ return num(r.t_d30) > 0; })
+                .sort(function(a,b){ return num(b.t_d30) - num(a.t_d30); });
 
   var P = [];
-  var s1 = "<p><b>Агаарын температур, хур тунадас.</b> Тайлант арав хоногт аймгийн хэмжээгээр агаарын дундаж температур "
-    + fmt(tAvg) + "°C байлаа. Хур тунадасны дундаж " + fmt(pAvg) + " мм";
-  if(withP.length){
-    var wet = withP[0], dry = withP[withP.length-1];
-    s1 += ", хамгийн их нь " + nm(wet.soum) + " суманд " + fmt(num(wet.precip)) + " мм, хамгийн бага нь "
-       + nm(dry.soum) + " суманд " + fmt(num(dry.precip)) + " мм тэмдэглэгдэв";
-  }
-  s1 += ".";
-  if(normPct !== null){
-    s1 += " Энэ нь олон жилийн дунджийн " + normPct + "%-тай тэнцэж байна.";
+  var s1 = "<p><b>Агаарын температур.</b> Тайлант 10 хоногт аймгийн хэмжээгээр агаарын дундаж температур "
+    + fmt(meanOf(data,"t_avg")) + "°C, хамгийн их нь " + fmt(Math.max.apply(null,
+        data.map(function(r){ return num(r.t_max); }).filter(function(v){ return v !== null; })), 0)
+    + "°C хүрлээ.";
+  if(hot.length){
+    s1 += " Агаарын температур 30°-аас давсан хоног " + stName(hot[0].st) + " станцад "
+       + fmt(num(hot[0].t_d30), 0) + " хоног бүртгэгдэв.";
   }
   P.push(s1 + "</p>");
 
+  var s2 = "<p><b>Хур тунадас.</b> Дундаж " + fmt(meanOf(data,"pr")) + " мм";
+  if(withP.length){
+    var wet = withP[0], dry = withP[withP.length-1];
+    s2 += ", хамгийн их нь " + stName(wet.st) + " станцад " + fmt(num(wet.pr)) + " мм, хамгийн бага нь "
+       + stName(dry.st) + " станцад " + fmt(num(dry.pr)) + " мм";
+  }
+  s2 += ". Тунадастай өдрийн дундаж тоо " + fmt(meanOf(data,"pr_d"), 1) + ".";
+  if(normPct !== null) s2 += " Олон жилийн дунджийн " + normPct + "%-тай тэнцэж байна.";
+  P.push(s2 + "</p>");
+
   if(below.length){
     P.push("<p><b>Хэвийн бус хуурайшилт.</b> " + below.join(", ")
-      + " суманд хур тунадас олон жилийн дунджийн 80%-иас доогуур орсон нь бэлчээрийн ургамлын "
-      + "ус хангамжид сөргөөр нөлөөлөх эрсдэлтэй байна.</p>");
+      + " станцын орчимд хур тунадас олон жилийн дунджийн 80%-иас доогуур байгаа нь "
+      + "бэлчээрийн ургамлын ус хангамжид сөргөөр нөлөөлөх эрсдэлтэй.</p>");
   }
 
-  var s3 = "<p><b>Хөрс, бэлчээрийн байдал.</b> Хөрсний дундаж чийг " + fmt(meanOf(data,"soil_moist"))
-    + "%, бэлчээрийн ургамлын өндөр дунджаар " + fmt(meanOf(data,"plant_h")) + " см, ургац "
-    + fmt(meanOf(data,"yield_p"), 2) + " ц/га байна.";
-  if(topPhase){
-    s3 += " Ургамлын хөгжлийн зонхилох үе шат — " + topPhase.toLowerCase()
-       + " (" + phaseCount[topPhase] + " суманд).";
+  var s3 = "<p><b>Хөрс, чийг, салхи.</b> Хөрсний дундаж температур " + fmt(meanOf(data,"s_avg"))
+    + "°C, агаарын харьцангуй чийг " + fmt(meanOf(data,"rh"), 0) + "%. Салхины хамгийн их хурдны дундаж "
+    + fmt(meanOf(data,"w_max"), 0) + " м/с";
+  if(windy.length){
+    s3 += "; 10 м/с-ээс их салхитай өдөр " + stName(windy[0].st) + " станцад "
+       + fmt(num(windy[0].w_d10), 0) + " өдөр тэмдэглэгдэв";
   }
-  if(snowy.length){ s3 += " Цасан бүрхүүлтэй: " + snowy.join(", ") + "."; }
-  P.push(s3 + "</p>");
+  P.push(s3 + ".</p>");
 
-  var c = [];
-  if(goodCond.length) c.push("сайн — " + goodCond.join(", "));
-  if(badCond.length)  c.push("муу буюу онцгой муу — " + badCond.join(", "));
-  if(c.length) P.push("<p><b>Бэлчээрийн нөхцөлийн үнэлгээ.</b> " + c.join("; ") + ".</p>");
+  var s4 = "<p><b>Ургамал.</b> Бэлчээрийн ургамлын өндөр дунджаар " + fmt(meanOf(data,"pl_h"))
+    + " см, бүрхэц " + fmt(meanOf(data,"pl_c"), 0) + "%, ургац " + fmt(meanOf(data,"pl_y"), 2) + " ц/га байна.";
+  var phases = {};
+  data.forEach(function(r){ if(r.phase) phases[r.phase] = (phases[r.phase]||0)+1; });
+  var topPhase = Object.keys(phases).sort(function(a,b){ return phases[b]-phases[a]; })[0];
+  if(topPhase) s4 += " Хөгжлийн зонхилох үе шат — " + topPhase.toLowerCase() + ".";
+  if(snowy.length) s4 += " Цасан бүрхүүлтэй: " + snowy.join(", ") + ".";
+  P.push(s4 + "</p>");
 
-  if(highRisk.length || midRisk.length){
-    P.push("<p><b>Ган, зудын эрсдэл.</b> "
-      + (highRisk.length ? "Өндөр эрсдэлтэй: " + highRisk.join(", ") + ". " : "")
-      + (midRisk.length ? "Дунд эрсдэлтэй: " + midRisk.join(", ") + ". " : "")
-      + "Эдгээр сумын малчдад отор нүүдэл, өвс тэжээлийн нөөцийн талаар зөвлөмж хүргүүлэх шаардлагатай.</p>");
+  var bad = data.filter(function(r){ return r.cond === "serious" || r.cond === "critical"; })
+                .map(function(r){ return stName(r.st); });
+  var risky = data.filter(function(r){ return r.risk === "critical" || r.risk === "warning"; })
+                  .map(function(r){ return stName(r.st) + " (" + RISK_BY_V[r.risk] + ")"; });
+  if(bad.length || risky.length){
+    P.push("<p><b>Бэлчээр, ган зудын үнэлгээ.</b> "
+      + (bad.length ? "Бэлчээрийн нөхцөл муу: " + bad.join(", ") + ". " : "")
+      + (risky.length ? "Эрсдэлтэй: " + risky.join(", ") + ". " : "")
+      + "Эдгээр нутгийн малчдад отор нүүдэл, өвс тэжээлийн нөөцийн талаар зөвлөмж хүргүүлэх шаардлагатай.</p>");
   }
 
-  var missing = SOUMS.filter(function(s){
-    return !data.some(function(r){ return r.soum === s.id; });
+  var missing = STATIONS.filter(function(s){
+    return !data.some(function(r){ return r.st === s.idx; });
   }).map(function(s){ return s.name; });
   if(missing.length){
     P.push("<p><b>Мэдээ дутуу.</b> " + missing.join(", ")
-      + " сумын мэдээ ирээгүй тул дээрх дүгнэлтийг " + data.length + " сумын мэдээгээр хийв.</p>");
+      + " станцын мэдээ ирээгүй тул дээрх дүгнэлтийг " + data.length + " станцын мэдээгээр хийв.</p>");
   }
-
   el.innerHTML = '<p class="hd">' + periodLabel() + "</p>" + P.join("");
 }
 
@@ -1221,13 +1207,15 @@ function renderNotices(){
   if(storeInfo.ephemeral && dbState === "ok"){
     h += '<div class="notice offline"><b>Түр зуурын хадгалалт.</b>'
       + "<span>Сервер дээр өгөгдлийн сан холбогдоогүй тул мэдээ файлд хадгалагдаж байна — "
-      + "серверийг дахин байршуулахад арилна. Railway дээр PostgreSQL нэмж, "
-      + "DATABASE_URL-ыг холбоно уу.</span></div>";
+      + "серверийг дахин байршуулахад арилна. Railway дээр PostgreSQL нэмнэ үү.</span></div>";
   }
+  h += '<div class="notice todo"><b>Тодруулах:</b>'
+    + "<span>Станц <b>339 Сайхан</b> ба <b>739</b> хоёрын байрлал тодорхойгүй тул зурагт ороогүй байна. "
+    + "Мөн Булган, Ханхонгор, Хүрмэн сум станцгүй эсэхийг батлах шаардлагатай.</span></div>";
   if(isDemo){
     h += '<div class="notice demo"><b>Жишээ өгөгдөл.</b>'
-      + "<span>Энэ арав хоногийн жинхэнэ мэдээ ороогүй тул хуудас яаж ажилладгийг үзүүлж байна. "
-      + "Эхний сум мэдээгээ оруулмагц жишээ бүрмөсөн алга болно.</span></div>";
+      + "<span>Энэ 10 хоногийн жинхэнэ мэдээ ороогүй тул хуудас яаж ажилладгийг үзүүлж байна. "
+      + "Эхний станц мэдээгээ оруулмагц жишээ бүрмөсөн алга болно.</span></div>";
   }
   document.getElementById("notices").innerHTML = h;
 }
@@ -1237,11 +1225,11 @@ function render(){
   isDemo = (rows.length === 0 && dbState !== "loading" && dbState !== "needcode");
   var data = isDemo ? demoRows() : rows;
 
-  document.getElementById("countNum").innerHTML = rows.length + "<small>/14</small>";
-  document.getElementById("countBar").style.width = (rows.length / 14 * 100) + "%";
-  document.getElementById("countLabel").textContent = rows.length === 14
-    ? "Бүх сумын мэдээ бүрдлээ — тоймоо баталгаажуулна уу"
-    : (14 - rows.length) + " сумын мэдээ хүлээгдэж байна";
+  document.getElementById("countNum").innerHTML = rows.length + "<small>/" + STATIONS.length + "</small>";
+  document.getElementById("countBar").style.width = (rows.length / STATIONS.length * 100) + "%";
+  document.getElementById("countLabel").textContent = rows.length === STATIONS.length
+    ? "Бүх станцын мэдээ бүрдлээ — тоймоо баталгаажуулна уу"
+    : (STATIONS.length - rows.length) + " станцын мэдээ хүлээгдэж байна";
   document.getElementById("tableNote").textContent = periodLabel();
 
   renderNotices();
@@ -1249,75 +1237,65 @@ function render(){
   renderHero(data);
   renderTable(data);
   barChart("chartPrecip", data, {
-    key:"precip", normKey:"precip_norm", unit:"мм", dgt:1,
-    aria:"Сум тус бүрийн хур тунадасны хэмжээ, олон жилийн дундажтай харьцуулсан хэвтээ баганан график"
+    key:"pr", normKey:"pr_norm", unit:"мм", dgt:1,
+    aria:"Станц тус бүрийн хур тунадасны хэмжээ, хэвтээ баганан график"
   });
   barChart("chartYield", data, {
-    key:"yield_p", unit:"ц/га", dgt:2,
-    aria:"Сум тус бүрийн бэлчээрийн ургацын хэмжээ, хэвтээ баганан график"
+    key:"pl_y", unit:"ц/га", dgt:2,
+    aria:"Станц тус бүрийн ургамлын ургацын хэмжээ, хэвтээ баганан график"
   });
   buildSummary(data);
 }
 
-/* ===================== маягт ===================== */
+/* ===================== нэг станцын маягт ===================== */
 function optionList(list, sel){
   return list.map(function(o){
     return '<option value="' + o.v + '"' + (o.v === sel ? " selected" : "") + ">" + o.label + "</option>";
   }).join("");
 }
-function fieldNum(id, label, hint, step){
-  return '<div class="f"><label for="' + id + '">' + label + "</label>"
-    + '<input id="' + id + '" type="number" step="' + (step || "0.1") + '" inputmode="decimal">'
-    + (hint ? '<span class="hint">' + hint + "</span>" : "") + "</div>";
-}
 function openForm(){
   var host = document.getElementById("dialogHost");
+  var body = GROUPS.map(function(g){
+    return '<div class="grp"><h4>' + g.g + "</h4><div class=\"rowgrid\">"
+      + g.f.map(function(c){
+          return '<div class="f"><label for="ff_' + c.f + '">' + (c.hh || c.h)
+            + (c.unit ? ", " + c.unit : "") + "</label>"
+            + '<input id="ff_' + c.f + '" type="text" inputmode="decimal" autocomplete="off"></div>';
+        }).join("")
+      + "</div></div>";
+  }).join("");
+
   host.innerHTML =
     '<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle">'
-    + '<div class="sheet-head"><div><h2 id="shTitle">Сумын арав хоногийн мэдээ</h2>'
-    + "<p>" + periodLabel() + " · нэг суманд нэг мэдээ, дахин оруулбал шинэчилнэ</p></div>"
+    + '<div class="sheet-head"><div><h2 id="shTitle">Станцын 10 хоногийн мэдээ</h2>'
+    + "<p>" + periodLabel() + " · нэг станцад нэг мэдээ, дахин оруулбал шинэчилнэ</p></div>"
     + '<button class="close-x" id="btnClose" aria-label="Хаах">&times;</button></div>'
-
     + '<div class="sheet-body">'
-    + '<div class="grp"><h4>Ерөнхий</h4><div class="rowgrid">'
-    +   '<div class="f"><label for="fSoum">Сум</label><select id="fSoum">'
-    +     SOUMS.map(function(s){ return '<option value="' + s.id + '">' + s.name + "</option>"; }).join("")
-    +   "</select></div>"
-    +   '<div class="f"><label for="fObs">Мэдээ өгсөн ажиглагч</label><input id="fObs" type="text" placeholder="Овог нэр"></div>'
+    + '<div class="grp"><h4>Салбар</h4><div class="rowgrid">'
+    +   '<div class="f"><label for="fSt">Станц</label><select id="fSt">'
+    +     STATIONS.map(function(s){
+            return '<option value="' + s.idx + '">' + s.idx + " · " + s.name + "</option>";
+          }).join("") + "</select></div>"
+    +   '<div class="f"><label for="fObs">Тоовор хийсэн</label><input id="fObs" type="text" placeholder="Овог нэр"></div>'
     + "</div></div>"
-
-    + '<div class="grp"><h4>Агаарын температур ба тунадас</h4><div class="rowgrid">'
-    +   fieldNum("fTavg", "Дундаж температур, °C")
-    +   fieldNum("fTmax", "Хамгийн их, °C")
-    +   fieldNum("fTmin", "Хамгийн бага, °C")
-    +   fieldNum("fPrecip", "Хур тунадас, мм")
-    +   fieldNum("fNorm", "Олон жилийн дундаж тунадас, мм", "Хэвийн байдлаас хазайлт бодоход хэрэглэнэ")
-    +   fieldNum("fWind", "Салхины хамгийн их хурд, м/с", "", "1")
-    + "</div></div>"
-
-    + '<div class="grp"><h4>Хөрс, цасан бүрхүүл</h4><div class="rowgrid">'
-    +   fieldNum("fMoist", "Хөрсний чийг, % (0–20 см)")
-    +   fieldNum("fStemp", "Хөрсний температур, °C (10 см)")
-    +   fieldNum("fSnow", "Цасан бүрхүүлийн зузаан, см", "", "1")
-    + "</div></div>"
-
-    + '<div class="grp"><h4>Бэлчээр, ургамал</h4><div class="rowgrid">'
-    +   fieldNum("fHeight", "Ургамлын өндөр, см")
-    +   fieldNum("fYield", "Бэлчээрийн ургац, ц/га", "Хатаамал жингээр", "0.01")
+    + body
+    + '<div class="grp"><h4>Нэмэлт үнэлгээ · маягт дээр байхгүй</h4><div class="rowgrid">'
+    +   '<div class="f"><label for="fNorm">Олон жилийн дундаж тунадас, мм</label>'
+    +     '<input id="fNorm" type="text" inputmode="decimal" autocomplete="off">'
+    +     '<span class="hint">Хэвийн байдлаас хазайлт бодоход хэрэглэнэ</span></div>'
     +   '<div class="f"><label for="fPhase">Хөгжлийн үе шат</label><select id="fPhase">'
+    +     '<option value="">— сонгоогүй —</option>'
     +     PHASES.map(function(p){ return '<option value="' + p + '">' + p + "</option>"; }).join("")
     +   "</select></div>"
     +   '<div class="f"><label for="fCond">Бэлчээрийн нөхцөл</label><select id="fCond">'
-    +     optionList(CONDS, "warning") + "</select></div>"
+    +     optionList(CONDS, "") + "</select></div>"
     +   '<div class="f"><label for="fRisk">Ган / зудын эрсдэл</label><select id="fRisk">'
-    +     optionList(RISKS, "none") + "</select></div>"
+    +     optionList(RISKS, "") + "</select></div>"
     + "</div></div>"
-
     + '<div class="grp"><h4>Тэмдэглэл</h4><div class="rowgrid full"><div class="f">'
-    +   '<textarea id="fNote" placeholder="Онцлох үзэгдэл, малын бэлчээрлэлт, усан хангамжийн байдал…"></textarea>'
+    +   '<textarea id="fNote" placeholder="Онцлох үзэгдэл, залруулга, дутуу хоног…"></textarea>'
     + "</div></div></div>"
     + "</div>"
-
     + '<div class="sheet-foot"><span class="form-msg" id="fMsg"></span>'
     + '<span style="display:flex;gap:8px"><button id="btnCancel">Болих</button>'
     + '<button class="primary" id="btnSave">Хадгалах</button></span></div>'
@@ -1334,45 +1312,45 @@ function openForm(){
 
   function set(id, v){ document.getElementById(id).value = (v === null || v === undefined) ? "" : v; }
   function fill(){
-    var id = document.getElementById("fSoum").value;
+    var idx = document.getElementById("fSt").value;
     var r = null;
-    rows.forEach(function(x){ if(x.soum === id) r = x; });
-    set("fTavg", r && r.t_avg); set("fTmax", r && r.t_max); set("fTmin", r && r.t_min);
-    set("fPrecip", r && r.precip); set("fNorm", r && r.precip_norm); set("fWind", r && r.wind_max);
-    set("fMoist", r && r.soil_moist); set("fStemp", r && r.soil_temp); set("fSnow", r && r.snow);
-    set("fHeight", r && r.plant_h); set("fYield", r && r.yield_p);
-    set("fObs", r && r.obs); set("fNote", r && r.note);
-    document.getElementById("fPhase").value = (r && r.phase) ? r.phase : PHASES[0];
-    document.getElementById("fCond").value = (r && r.cond) ? r.cond : "warning";
-    document.getElementById("fRisk").value = (r && r.risk) ? r.risk : "none";
+    rows.forEach(function(x){ if(x.st === idx) r = x; });
+    FIELDS.forEach(function(c){ set("ff_" + c.f, r && r[c.f]); });
+    set("fNorm", r && r.pr_norm);
+    set("fObs", r && r.obs);
+    set("fNote", r && r.note);
+    document.getElementById("fPhase").value = (r && r.phase) ? r.phase : "";
+    document.getElementById("fCond").value  = (r && r.cond)  ? r.cond  : "";
+    document.getElementById("fRisk").value  = (r && r.risk)  ? r.risk  : "";
     var msg = document.getElementById("fMsg");
     msg.className = "form-msg" + (r ? " ok" : "");
-    msg.textContent = r ? "Энэ сум мэдээгээ өгсөн байна — хадгалбал шинэчилнэ." : "";
+    msg.textContent = r ? "Энэ станц мэдээгээ өгсөн байна — хадгалбал шинэчилнэ." : "";
   }
-  document.getElementById("fSoum").onchange = fill;
+  document.getElementById("fSt").onchange = fill;
   fill();
-  document.getElementById("fSoum").focus();
+  document.getElementById("fSt").focus();
 
   document.getElementById("btnSave").onclick = function(){
     var msg = document.getElementById("fMsg");
-    function g(id){ var v = document.getElementById(id).value.trim(); return v === "" ? null : (+v); }
-    var soum = document.getElementById("fSoum").value;
-    var rec = {
-      period: key(), year: period.y, month: period.m, decade: period.d, soum: soum,
-      t_avg: g("fTavg"), t_max: g("fTmax"), t_min: g("fTmin"),
-      precip: g("fPrecip"), precip_norm: g("fNorm"), wind_max: g("fWind"),
-      soil_moist: g("fMoist"), soil_temp: g("fStemp"), snow: g("fSnow"),
-      plant_h: g("fHeight"), yield_p: g("fYield"),
-      phase: document.getElementById("fPhase").value,
-      cond: document.getElementById("fCond").value,
-      risk: document.getElementById("fRisk").value,
-      obs: document.getElementById("fObs").value.trim(),
-      note: document.getElementById("fNote").value.trim(),
-      at: new Date().toISOString()
-    };
-    if(rec.t_avg === null && rec.precip === null){
+    function g(id){
+      var v = document.getElementById(id).value.trim().replace(",", ".");
+      if(v === "") return null;
+      var n = +v; return isFinite(n) ? n : null;
+    }
+    var idx = document.getElementById("fSt").value;
+    var rec = { period: key(), year: period.y, month: period.m, decade: period.d, st: idx };
+    FIELDS.forEach(function(c){ rec[c.f] = g("ff_" + c.f); });
+    rec.pr_norm = g("fNorm");
+    rec.phase = document.getElementById("fPhase").value;
+    rec.cond  = document.getElementById("fCond").value;
+    rec.risk  = document.getElementById("fRisk").value;
+    rec.obs   = document.getElementById("fObs").value.trim();
+    rec.note  = document.getElementById("fNote").value.trim();
+    rec.at    = new Date().toISOString();
+
+    if(rec.t_avg === null && rec.pr === null){
       msg.className = "form-msg";
-      msg.textContent = "Ядаж дундаж температур эсвэл хур тунадасны хэмжээг бөглөнө үү.";
+      msg.textContent = "Ядаж агаарын дундаж температур эсвэл хур тунадасны хэмжээг бөглөнө үү.";
       return;
     }
     if(!store){
@@ -1383,62 +1361,19 @@ function openForm(){
     var btn = document.getElementById("btnSave");
     btn.disabled = true;
     btn.textContent = "Хадгалж байна…";
-    store.save(rec).then(function(){
-      close();
-    }).catch(function(e){
+    store.save(rec).then(close).catch(function(e){
       btn.disabled = false;
       btn.textContent = "Хадгалах";
       msg.className = "form-msg";
       if(e && e.code === "code_required"){ close(); needCode(); return; }
       msg.textContent = (e && e.code === "quota_exceeded")
-        ? "Санд зай дүүрчээ. Хуучин арав хоногийн мэдээг цэвэрлэх шаардлагатай."
+        ? "Санд зай дүүрчээ. Хуучин мэдээг цэвэрлэх шаардлагатай."
         : "Хадгалж чадсангүй. Түр хүлээгээд дахин оролдоно уу.";
     });
   };
 }
 
-/* ============ 14 сумыг дараалуулж бөглөх хурдан горим ============ */
-var GRID_NUM = [
-  {f:"t_avg",       h:"t° дундаж"},
-  {f:"t_max",       h:"t° их"},
-  {f:"t_min",       h:"t° бага"},
-  {f:"precip",      h:"Тунадас, мм"},
-  {f:"precip_norm", h:"ОЖД, мм"},
-  {f:"wind_max",    h:"Салхи, м/с"},
-  {f:"soil_moist",  h:"Хөрсний чийг, %"},
-  {f:"soil_temp",   h:"Хөрсний t°"},
-  {f:"snow",        h:"Цас, см"},
-  {f:"plant_h",     h:"Өндөр, см"},
-  {f:"yield_p",     h:"Ургац, ц/га"}
-];
-function gridSelCols(){
-  return [
-    {f:"phase", h:"Үе шат",  list: PHASES.map(function(p){ return {v:p, label:p}; })},
-    {f:"cond",  h:"Нөхцөл",  list: CONDS},
-    {f:"risk",  h:"Ган / зуд", list: RISKS}
-  ];
-}
-var GRID_COLS = 0;
-
-/* Өмнөх оны ижил сар, ижил арав хоногийн ОЖД-г санал болгоно.
-   ОЖД нь арав хоног тус бүрдээ өөр тул зөвхөн яг тэр хугацаанаас авна. */
-function loadNormHints(){
-  if(!store) return Promise.resolve({});
-  return store.byMonth(period.m)
-    .then(function(list){
-      var best = {};
-      list.forEach(function(r){
-        if(!r || r.decade !== period.d || r.year >= period.y) return;
-        if(num(r.precip_norm) === null || num(r.precip_norm) <= 0) return;
-        if(!best[r.soum] || r.year > best[r.soum].year){
-          best[r.soum] = { year: r.year, v: num(r.precip_norm) };
-        }
-      });
-      return best;
-    })
-    .catch(function(){ return {}; });
-}
-
+/* ============ 14 станцыг дараалуулж бөглөх хурдан горим ============ */
 function parseCell(raw){
   if(raw === null || raw === undefined) return null;
   var s = String(raw).trim().replace(/\s+/g, "").replace(",", ".");
@@ -1446,61 +1381,68 @@ function parseCell(raw){
   var n = +s;
   return isFinite(n) ? n : null;
 }
+function loadNormHints(){
+  if(!store) return Promise.resolve({});
+  return store.byMonth(period.m).then(function(list){
+    var best = {};
+    list.forEach(function(r){
+      if(!r || r.decade !== period.d || r.year >= period.y) return;
+      if(num(r.pr_norm) === null || num(r.pr_norm) <= 0) return;
+      if(!best[r.st] || r.year > best[r.st].year) best[r.st] = { year: r.year, v: num(r.pr_norm) };
+    });
+    return best;
+  }).catch(function(){ return {}; });
+}
+var GRID_COLS = 0;
 
 function openGrid(){
   var host = document.getElementById("dialogHost");
-  var selCols = gridSelCols();
-  GRID_COLS = GRID_NUM.length + selCols.length + 1;
+  GRID_COLS = FIELDS.length + 2; // + ОЖД + тоовор хийсэн
 
-  var head = '<th>Сум</th>'
-    + GRID_NUM.map(function(c){ return "<th>" + c.h + "</th>"; }).join("")
-    + selCols.map(function(c){ return "<th>" + c.h + "</th>"; }).join("")
-    + "<th>Ажиглагч</th>";
+  var h1 = '<tr class="grp-row"><th rowspan="2">Салбар</th>';
+  GROUPS.forEach(function(g){ h1 += '<th colspan="' + g.f.length + '">' + g.g + "</th>"; });
+  h1 += '<th colspan="2">Нэмэлт</th></tr>';
+  var h2 = '<tr class="f-row">';
+  FIELDS.forEach(function(c){
+    h2 += "<th" + (c.first ? ' class="gsep"' : "") + ">" + c.h + "</th>";
+  });
+  h2 += '<th class="gsep">ОЖД, мм</th><th>Тоовор хийсэн</th></tr>';
 
   var byId = {};
-  rows.forEach(function(r){ byId[r.soum] = r; });
+  rows.forEach(function(r){ byId[r.st] = r; });
 
-  var body = SOUMS.map(function(s, ri){
-    var r = byId[s.id] || {};
-    var filled = rows.some(function(x){ return x.soum === s.id; });
-    var tds = '<td class="name">' + s.name + "<span>" + s.st + "</span></td>";
-    GRID_NUM.forEach(function(c, ci){
+  var body = STATIONS.map(function(s, ri){
+    var r = byId[s.idx] || {};
+    var filled = rows.some(function(x){ return x.st === s.idx; });
+    var tds = '<td class="name">' + s.name + "<span>" + s.idx + "</span></td>";
+    FIELDS.forEach(function(c, ci){
       var v = (r[c.f] === null || r[c.f] === undefined) ? "" : r[c.f];
-      tds += '<td><input type="text" inputmode="decimal" autocomplete="off"'
-          +  ' data-r="' + ri + '" data-c="' + ci + '" data-f="' + c.f + '"'
-          +  ' data-soum="' + s.id + '" value="' + esc(v) + '"></td>';
+      tds += "<td" + (c.first ? ' class="gsep"' : "") + '><input type="text" inputmode="decimal" '
+          +  'autocomplete="off" data-r="' + ri + '" data-c="' + ci + '" data-f="' + c.f + '" value="'
+          +  esc(v) + '"></td>';
     });
-    selCols.forEach(function(c, k){
-      var ci = GRID_NUM.length + k;
-      var cur = r[c.f];
-      if(c.f === "phase" && !cur) cur = PHASES[0];
-      if(c.f === "cond"  && !cur) cur = "warning";
-      if(c.f === "risk"  && !cur) cur = "none";
-      tds += "<td><select data-r=\"" + ri + '" data-c="' + ci + '" data-f="' + c.f + '" data-soum="' + s.id + '">'
-          +  c.list.map(function(o){
-               return '<option value="' + esc(o.v) + '"' + (o.v === cur ? " selected" : "") + ">" + o.label + "</option>";
-             }).join("")
-          +  "</select></td>";
-    });
+    var nv = (r.pr_norm === null || r.pr_norm === undefined) ? "" : r.pr_norm;
+    tds += '<td class="gsep"><input type="text" inputmode="decimal" autocomplete="off" data-r="' + ri
+        +  '" data-c="' + FIELDS.length + '" data-f="pr_norm" value="' + esc(nv) + '"></td>';
     tds += '<td><input type="text" class="obs" autocomplete="off" data-r="' + ri + '" data-c="'
-        +  (GRID_COLS-1) + '" data-f="obs" data-soum="' + s.id + '" value="' + esc(r.obs || "") + '"></td>';
+        +  (FIELDS.length+1) + '" data-f="obs" value="' + esc(r.obs || "") + '"></td>';
     return '<tr class="' + (filled ? "filled" : "") + '">' + tds + "</tr>";
   }).join("");
 
   host.innerHTML =
     '<div class="scrim" id="scrim"><div class="sheet wide" role="dialog" aria-modal="true" aria-labelledby="gTitle">'
-    + '<div class="sheet-head"><div><h2 id="gTitle">14 сумыг дараалуулж бөглөх</h2>'
-    + "<p>" + periodLabel() + " · бөглөсөн мөрүүд л хадгалагдана</p></div>"
+    + '<div class="sheet-head"><div><h2 id="gTitle">14 станцыг дараалуулж бөглөх</h2>'
+    + "<p>" + periodLabel() + " · багана нь гар бичмэл маягтын дараалалтай ижил</p></div>"
     + '<button class="close-x" id="btnClose" aria-label="Хаах">&times;</button></div>'
     + '<div class="sheet-body">'
     + '<p class="grid-hint">'
     +   "<span><kbd>Tab</kbd> баруун тийш</span>"
     +   "<span><kbd>Enter</kbd> доошоо, <kbd>Shift</kbd>+<kbd>Enter</kbd> дээшээ</span>"
-    +   "<span><kbd>Ctrl</kbd>+<kbd>V</kbd> Excel-ээс хэсэг блокоор нааж болно</span>"
+    +   "<span><kbd>Ctrl</kbd>+<kbd>V</kbd> ХААЦУС эсвэл Excel-ээс блокоор наана</span>"
     + "</p>"
-    + '<div class="grid-scroll"><table class="grid"><thead><tr>' + head + "</tr></thead>"
+    + '<div class="grid-scroll"><table class="grid"><thead>' + h1 + h2 + "</thead>"
     + "<tbody>" + body + "</tbody></table></div>"
-    + '<p class="grid-legend" id="gLegend">Зүүн талын хөх зураас = энэ сум мэдээгээ аль хэдийн өгсөн.</p>'
+    + '<p class="grid-legend" id="gLegend">Зүүн талын хөх зураас = энэ станц мэдээгээ аль хэдийн өгсөн.</p>'
     + "</div>"
     + '<div class="sheet-foot"><span class="form-msg" id="gMsg"></span>'
     + '<span style="display:flex;gap:8px"><button id="btnCancel">Болих</button>'
@@ -1517,45 +1459,39 @@ function openGrid(){
   });
 
   var table = host.querySelector("table.grid");
-  function cell(r, c){
-    return table.querySelector('[data-r="' + r + '"][data-c="' + c + '"]');
-  }
+  function cell(r, c){ return table.querySelector('[data-r="' + r + '"][data-c="' + c + '"]'); }
 
-  /* --- ОЖД-ын санал: өмнөх оны ижил арав хоногоос --- */
   loadNormHints().then(function(hints){
     var used = [];
-    SOUMS.forEach(function(s, ri){
-      var h = hints[s.id];
-      if(!h) return;
-      var el = cell(ri, 4); // precip_norm
+    STATIONS.forEach(function(s, ri){
+      var hh = hints[s.idx];
+      if(!hh) return;
+      var el = cell(ri, FIELDS.length);
       if(el && el.value.trim() === ""){
-        el.value = h.v;
+        el.value = hh.v;
         el.className = "hinted";
-        el.title = h.year + " оны ижил арав хоногийн мэдээнээс санал болгов";
+        el.title = hh.year + " оны ижил 10 хоногийн мэдээнээс санал болгов";
         used.push(s.name);
       }
     });
     if(used.length){
       document.getElementById("gLegend").innerHTML =
-        "Зүүн талын хөх зураас = энэ сум мэдээгээ аль хэдийн өгсөн. · "
-        + "<b>ОЖД</b> баганад " + used.length + " сумын утгыг өмнөх оны ижил арав хоногоос санал болгов "
-        + "(саарал нүд) — буруу бол дарж засна уу.";
+        "Зүүн талын хөх зураас = энэ станц мэдээгээ аль хэдийн өгсөн. · <b>ОЖД</b> баганад "
+        + used.length + " станцын утгыг өмнөх оны ижил 10 хоногоос санал болгов (саарал нүд).";
     }
   });
 
-  /* --- гарын навигаци --- */
   table.addEventListener("keydown", function(e){
     var t = e.target;
     if(!t.hasAttribute || !t.hasAttribute("data-r")) return;
     var r = +t.getAttribute("data-r"), c = +t.getAttribute("data-c");
     if(e.key === "Enter"){
       e.preventDefault();
-      var nr = e.shiftKey ? r-1 : r+1;
-      var nx = cell(nr, c);
+      var nx = cell(e.shiftKey ? r-1 : r+1, c);
       if(nx){ nx.focus(); if(nx.select) nx.select(); }
       return;
     }
-    if((e.key === "ArrowDown" || e.key === "ArrowUp") && t.tagName === "INPUT"){
+    if(e.key === "ArrowDown" || e.key === "ArrowUp"){
       e.preventDefault();
       var n2 = cell(e.key === "ArrowDown" ? r+1 : r-1, c);
       if(n2){ n2.focus(); if(n2.select) n2.select(); }
@@ -1565,14 +1501,13 @@ function openGrid(){
     if(e.target.tagName === "INPUT" && e.target.select) e.target.select();
   });
 
-  /* --- Excel-ээс блокоор наах --- */
   table.addEventListener("paste", function(e){
     var t = e.target;
     if(!t.hasAttribute || !t.hasAttribute("data-r")) return;
     var cb = (e.clipboardData || window.clipboardData);
     if(!cb) return;
     var text = cb.getData("text");
-    if(!text || text.indexOf("\t") === -1 && text.indexOf("\n") === -1) return; // ганц нүд бол хэвийн наалт
+    if(!text || (text.indexOf("\t") === -1 && text.indexOf("\n") === -1)) return;
     e.preventDefault();
     var r0 = +t.getAttribute("data-r"), c0 = +t.getAttribute("data-c");
     var lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
@@ -1582,22 +1517,12 @@ function openGrid(){
       line.split("\t").forEach(function(raw, j){
         var el = cell(r0 + i, c0 + j);
         if(!el) return;
-        var v = String(raw).trim();
-        if(el.tagName === "SELECT"){
-          var hit = null;
-          Array.prototype.forEach.call(el.options, function(o){
-            if(o.value.toLowerCase() === v.toLowerCase() || o.text.toLowerCase() === v.toLowerCase()) hit = o.value;
-          });
-          if(hit !== null){ el.value = hit; n++; }
-        } else if(el.getAttribute("data-f") === "obs"){
-          el.value = v; n++;
-        } else {
-          var p = parseCell(v);
-          el.value = (p === null ? "" : p);
-          el.className = "";
-          el.title = "";
-          n++;
-        }
+        if(el.getAttribute("data-f") === "obs"){ el.value = String(raw).trim(); n++; return; }
+        var p = parseCell(raw);
+        el.value = (p === null ? "" : p);
+        el.className = "";
+        el.title = "";
+        n++;
       });
     });
     var m = document.getElementById("gMsg");
@@ -1605,7 +1530,6 @@ function openGrid(){
     m.textContent = n + " нүд буулаа. Шалгаад «Бүгдийг хадгалах» дарна уу.";
   });
 
-  /* --- бүгдийг хадгалах --- */
   document.getElementById("btnSaveAll").onclick = function(){
     var msg = document.getElementById("gMsg");
     if(!store){
@@ -1614,63 +1538,54 @@ function openGrid(){
       return;
     }
     var recs = [];
-    SOUMS.forEach(function(s, ri){
-      var rec = {
-        period: key(), year: period.y, month: period.m, decade: period.d, soum: s.id,
-        at: new Date().toISOString()
-      };
-      GRID_NUM.forEach(function(c, ci){
+    STATIONS.forEach(function(s, ri){
+      var rec = { period: key(), year: period.y, month: period.m, decade: period.d, st: s.idx,
+                  at: new Date().toISOString() };
+      FIELDS.forEach(function(c, ci){
         var el = cell(ri, ci);
         rec[c.f] = el ? parseCell(el.value) : null;
       });
-      selCols.forEach(function(c, k){
-        var el = cell(ri, GRID_NUM.length + k);
-        rec[c.f] = el ? el.value : null;
-      });
-      var oe = cell(ri, GRID_COLS-1);
+      var ne = cell(ri, FIELDS.length);
+      rec.pr_norm = ne ? parseCell(ne.value) : null;
+      var oe = cell(ri, FIELDS.length + 1);
       rec.obs = oe ? oe.value.trim() : "";
       var prev = null;
-      rows.forEach(function(x){ if(x.soum === s.id) prev = x; });
-      rec.note = prev && prev.note ? prev.note : "";
-      if(rec.t_avg === null && rec.precip === null) return; // хоосон мөрийг алгасна
+      rows.forEach(function(x){ if(x.st === s.idx) prev = x; });
+      rec.note  = prev && prev.note  ? prev.note  : "";
+      rec.phase = prev && prev.phase ? prev.phase : "";
+      rec.cond  = prev && prev.cond  ? prev.cond  : "";
+      rec.risk  = prev && prev.risk  ? prev.risk  : "";
+      if(rec.t_avg === null && rec.pr === null) return;
       recs.push(rec);
     });
 
     if(!recs.length){
       msg.className = "form-msg";
-      msg.textContent = "Нэг ч мөр бөглөгдөөгүй байна. Ядаж температур эсвэл тунадасны багана шаардлагатай.";
+      msg.textContent = "Нэг ч мөр бөглөгдөөгүй байна. Ядаж агаарын дундаж эсвэл тунадасны багана шаардлагатай.";
       return;
     }
-
     var btn = document.getElementById("btnSaveAll");
     btn.disabled = true;
     var okCount = 0, failed = [];
-
     function step(i){
       if(i >= recs.length){
         btn.disabled = false;
         btn.textContent = "Бүгдийг хадгалах";
         if(!failed.length){ close(); return; }
         msg.className = "form-msg";
-        msg.textContent = okCount + " сум хадгалагдлаа. " + failed.join(", ")
-          + " амжилтгүй — дахин оролдоно уу.";
+        msg.textContent = okCount + " станц хадгалагдлаа. " + failed.join(", ") + " амжилтгүй.";
         return;
       }
       btn.textContent = "Хадгалж байна… " + (i+1) + "/" + recs.length;
-      store.save(recs[i]).then(function(){
-        okCount++;
-        step(i+1);
-      }).catch(function(e){
-        if(e && e.code === "code_required"){
-          btn.disabled = false;
-          btn.textContent = "Бүгдийг хадгалах";
-          close();
-          needCode();
-          return;
-        }
-        failed.push(SOUM_BY_ID[recs[i].soum] ? SOUM_BY_ID[recs[i].soum].name : recs[i].soum);
-        step(i+1);
-      });
+      store.save(recs[i]).then(function(){ okCount++; step(i+1); })
+        .catch(function(e){
+          if(e && e.code === "code_required"){
+            btn.disabled = false; btn.textContent = "Бүгдийг хадгалах";
+            close(); needCode(); return;
+          }
+          failed.push(stName(recs[i].st));
+          step(i+1);
+        });
     }
     step(0);
   };
@@ -1681,26 +1596,30 @@ function openGrid(){
 
 /* ===================== CSV ===================== */
 function csvText(){
-  var H = ["Сум","Станц","Он","Сар","Арав хоног","t дундаж","t их","t бага","Тунадас мм","ОЖД мм",
-    "Салхи м/с","Хөрсний чийг %","Хөрсний t","Цас см","Ургамлын өндөр см","Ургац ц/га",
-    "Хөгжлийн үе шат","Бэлчээрийн нөхцөл","Ган зуд","Ажиглагч","Тэмдэглэл"];
+  var H = ["Салбар","Станц","Он","Сар","10 хоног"];
+  FIELDS.forEach(function(c){ H.push((c.hh || c.h) + (c.unit ? ", " + c.unit : "")); });
+  H.push("ОЖД, мм", "Хөгжлийн үе шат", "Бэлчээрийн нөхцөл", "Ган зуд", "Тоовор хийсэн", "Тэмдэглэл");
+
   var src = isDemo ? demoRows() : rows;
   var byId = {};
-  src.forEach(function(r){ byId[r.soum] = r; });
+  src.forEach(function(r){ byId[r.st] = r; });
   function q(v){ return '"' + String(v === null || v === undefined ? "" : v).replace(/"/g, '""') + '"'; }
+
   var lines = [H.map(q).join(",")];
-  SOUMS.forEach(function(s){
-    var r = byId[s.id] || {};
-    lines.push([s.name, s.st, period.y, period.m, DEC_ROMAN[period.d],
-      r.t_avg, r.t_max, r.t_min, r.precip, r.precip_norm, r.wind_max,
-      r.soil_moist, r.soil_temp, r.snow, r.plant_h, r.yield_p,
-      r.phase, COND_BY_V[r.cond], RISK_BY_V[r.risk], r.obs, r.note].map(q).join(","));
+  STATIONS.forEach(function(s){
+    var r = byId[s.idx] || {};
+    var row = [s.idx, s.name, period.y, MONTHS[period.m-1], "0" + period.d];
+    FIELDS.forEach(function(c){ row.push(r[c.f]); });
+    row.push(r.pr_norm, r.phase, COND_BY_V[r.cond], RISK_BY_V[r.risk], r.obs, r.note);
+    lines.push(row.map(q).join(","));
   });
   return "﻿" + lines.join("\r\n");
 }
 
 /* ===================== эхлүүлэлт ===================== */
 (function init(){
+  renderHead();
+
   var ys = document.getElementById("pYear");
   for(var y = now.getFullYear() + 1; y >= now.getFullYear() - 4; y--){
     ys.insertAdjacentHTML("beforeend",
@@ -1725,7 +1644,6 @@ function csvText(){
   document.getElementById("btnAdd").onclick = openForm;
   document.getElementById("btnGrid").onclick = openGrid;
 
-  /* --- газрын зургийн үзүүлэлт солих --- */
   document.getElementById("mapPrev").onclick = function(){ setMapView(mapView - 1); startMapCycle(); };
   document.getElementById("mapNext").onclick = function(){ setMapView(mapView + 1); startMapCycle(); };
   document.getElementById("mapDots").addEventListener("click", function(e){
@@ -1747,7 +1665,8 @@ function csvText(){
 
   document.getElementById("btnCopy").onclick = function(){
     var btn = document.getElementById("btnCopy");
-    var text = periodLabel() + "\n\n" + document.getElementById("summary").innerText;
+    var text = periodLabel() + "\n\n" + document.getElementById("summary").innerText
+             + "\n\nТоовор хийсэн: ......................    Шалгасан инженер: ......................";
     function done(t){ btn.textContent = t; setTimeout(function(){ btn.textContent = "Тоймыг хуулах"; }, 1800); }
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(function(){ done("Хуулагдлаа"); })

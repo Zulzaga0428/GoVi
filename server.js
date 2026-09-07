@@ -1,7 +1,7 @@
 /*
  * GoVi — Өмнөговь ХААЦУ нэгтгэл
  *
- * Нэг файлт сервер: хуудсыг үйлчилж, 14 сумын арав хоногийн мэдээг хадгална.
+ * Нэг файлт сервер: хуудсыг үйлчилж, 14 станцын 10 хоногийн мэдээг хадгална.
  *
  * Хадгалалт хоёр горимтой:
  *   DATABASE_URL тохируулсан бол  → PostgreSQL (Railway дээр санал болгож буй горим)
@@ -28,23 +28,32 @@ const DATA_FILE = path.join(DATA_DIR, "reports.json");
 
 /* ==================== хадгалалт ==================== */
 
-/* Мэдээний нэг баримт: reports/{period}-{soum} гэсэн ID-тай.
-   period нь "2026-09-1" хэлбэртэй (он-сар-арав хоног). */
+/* Мэдээний нэг баримт: reports/{period}-{станцын индекс} гэсэн ID-тай.
+   period нь "2026-09-1" хэлбэртэй (он-сар-10 хоног). */
 function docId(rec) {
-  return `${rec.period}-${rec.soum}`;
+  return `${rec.period}-${rec.st}`;
 }
 
+/* Багана нь гар бичмэл маягтын дараалалтай ижил:
+   Агаар → Хөрс → Чийг → Салхи → Хур тунадас → Ургамал → Цас, дараа нь нэмэлт. */
 const FIELDS = [
-  "period", "year", "month", "decade", "soum",
-  "t_avg", "t_max", "t_min", "precip", "precip_norm", "wind_max",
-  "soil_moist", "soil_temp", "snow", "plant_h", "yield_p",
-  "phase", "cond", "risk", "obs", "note", "at"
+  "period", "year", "month", "decade", "st",
+  "t_avg", "t_max", "t_min", "t_d30",
+  "s_avg", "s_max", "s_min", "s_d40",
+  "rh",
+  "w_max", "w_d10",
+  "pr", "pr_d",
+  "pl_h", "pl_c", "pl_y",
+  "sn_d", "sn_b",
+  "pr_norm", "phase", "cond", "risk", "obs", "note", "at"
 ];
 
 const NUMERIC = new Set([
   "year", "month", "decade",
-  "t_avg", "t_max", "t_min", "precip", "precip_norm", "wind_max",
-  "soil_moist", "soil_temp", "snow", "plant_h", "yield_p"
+  "t_avg", "t_max", "t_min", "t_d30",
+  "s_avg", "s_max", "s_min", "s_d40",
+  "rh", "w_max", "w_d10", "pr", "pr_d",
+  "pl_h", "pl_c", "pl_y", "sn_d", "sn_b", "pr_norm"
 ]);
 
 /* Гаднаас ирсэн биетийг мэдэгдэж буй талбаруудаар шүүж, төрлийг нь баталгаажуулна. */
@@ -68,8 +77,8 @@ function sanitize(body) {
   }
 
   if (!/^\d{4}-\d{2}-[123]$/.test(out.period || "")) return null;
-  if (!/^[a-z_]{2,40}$/.test(out.soum || "")) return null;
-  if (out.t_avg === null && out.precip === null) return null;
+  if (!/^\d{3,6}$/.test(out.st || "")) return null;          // станцын индекс
+  if (out.t_avg === null && out.pr === null) return null;
 
   out.at = new Date().toISOString();
   return out;
@@ -121,7 +130,7 @@ class PgStore {
         year       integer,
         month      integer,
         decade     integer,
-        soum       text NOT NULL,
+        st         text NOT NULL,
         data       jsonb NOT NULL,
         updated_at timestamptz NOT NULL DEFAULT now()
       )
@@ -139,13 +148,13 @@ class PgStore {
   }
   async put(rec) {
     await this.pool.query(
-      `INSERT INTO reports (id, period, year, month, decade, soum, data, updated_at)
+      `INSERT INTO reports (id, period, year, month, decade, st, data, updated_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7, now())
        ON CONFLICT (id) DO UPDATE
          SET data = EXCLUDED.data, updated_at = now(),
              period = EXCLUDED.period, year = EXCLUDED.year,
              month = EXCLUDED.month, decade = EXCLUDED.decade`,
-      [docId(rec), rec.period, rec.year, rec.month, rec.decade, rec.soum, rec]
+      [docId(rec), rec.period, rec.year, rec.month, rec.decade, rec.st, rec]
     );
   }
 }
