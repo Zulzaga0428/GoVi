@@ -1,0 +1,169 @@
+/* ==========================================================================
+   Landing (/) — захиалагч, дарга, шинэ аймагт зориулсан нүүр хуудас.
+   Ажлын самбарыг өдөр бүр хэрэглэдэг мэргэжилтэн энэ хуудсыг нэг л удаа харна.
+   ========================================================================== */
+
+.lp-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  max-width: 1180px; margin: 0 auto; padding: 20px;
+}
+.lp-brand { display: flex; align-items: baseline; gap: 10px; }
+.lp-brand .name {
+  font-family: var(--font-serif), Georgia, serif; font-weight: 700;
+  font-size: 20px; letter-spacing: -0.015em;
+}
+.lp-brand .org { font-size: 11.5px; color: var(--muted); }
+
+.lp-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: var(--on-accent);
+  border: 1px solid var(--accent); border-radius: 3px;
+  padding: 10px 18px; font-size: 14px; font-weight: 500;
+  text-decoration: none; white-space: nowrap;
+}
+.lp-cta:hover { filter: brightness(1.08); }
+.lp-cta.ghost { background: transparent; color: var(--ink); border-color: var(--rule-strong); }
+.lp-cta.ghost:hover { background: var(--surface-2); filter: none; }
+
+/* ---------- hero: 100vh БИШ. Доод хэсгийн үзүүр харагдана. ---------- */
+
+.lp-hero {
+  max-width: 1180px; margin: 0 auto; padding: 8px 20px 40px;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+  gap: 40px; align-items: center; min-height: min(78vh, 720px);
+}
+@media (max-width: 900px) {
+  .lp-hero { grid-template-columns: 1fr; gap: 28px; min-height: 0; padding-bottom: 32px; }
+}
+
+.lp-hero h1 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(34px, 5.4vw, 60px);
+  line-height: 1.04; font-weight: 700; letter-spacing: -0.025em;
+  text-wrap: balance; margin: 0 0 20px;
+}
+.lp-hero h1 em {
+  font-style: normal; display: block; color: var(--ink-2);
+  font-weight: 400; font-size: 0.56em; line-height: 1.28;
+  letter-spacing: -0.01em; margin-top: 14px;
+}
+.lp-sub {
+  font-size: 16px; line-height: 1.62; color: var(--ink-2);
+  max-width: 52ch; margin: 0 0 26px;
+}
+.lp-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.lp-note { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+/* ---------- амьд өгөгдлийн самбар ---------- */
+
+.lp-live {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 5px; box-shadow: var(--shadow-lg); overflow: hidden;
+}
+.lp-live-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+}
+.lp-live-head .ttl { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
+.lp-live-head .when { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lp-pulse {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--good-ink); font-weight: 600;
+}
+.lp-pulse i {
+  width: 7px; height: 7px; border-radius: 99px; background: var(--good-map);
+  animation: lp-blink 2.4s ease-in-out infinite;
+}
+@keyframes lp-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.lp-live-body { padding: 16px; }
+.lp-live-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+.lp-live-grid > div { border-top: 1px solid var(--rule); padding-top: 9px; }
+.lp-live-grid dt {
+  font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--muted); font-weight: 600; margin-bottom: 4px;
+}
+.lp-live-grid dd {
+  margin: 0; font-size: 22px; font-weight: 600; line-height: 1.1;
+  letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+}
+.lp-live-grid dd small { font-size: 12px; font-weight: 500; color: var(--ink-2); margin-left: 3px; }
+.lp-live-foot {
+  padding: 11px 16px; border-top: 1px solid var(--rule);
+  font-size: 11.5px; color: var(--muted); background: var(--surface-2);
+}
+
+.lp-mini-map { padding: 4px 16px 0; }
+.lp-mini-map svg { width: 100%; height: auto; display: block; }
+
+/* ---------- гурван блок ---------- */
+
+.lp-band { border-top: 1px solid var(--rule); background: var(--surface); }
+.lp-band-inner { max-width: 1180px; margin: 0 auto; padding: 52px 20px; }
+
+.lp-band h2 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(22px, 2.6vw, 30px); font-weight: 700;
+  letter-spacing: -0.018em; margin: 0 0 8px; text-wrap: balance;
+}
+.lp-band .lead { font-size: 15px; color: var(--ink-2); max-width: 58ch; margin: 0 0 32px; }
+
+.lp-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; }
+@media (max-width: 820px) { .lp-steps { grid-template-columns: 1fr; gap: 22px; } }
+
+.lp-step { display: flex; flex-direction: column; gap: 8px; }
+.lp-step .num {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px; color: var(--accent); font-weight: 500;
+  letter-spacing: 0.1em; padding-bottom: 8px; border-bottom: 2px solid var(--accent);
+  width: fit-content; min-width: 34px;
+}
+.lp-step h3 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; margin-top: 2px; }
+.lp-step p { font-size: 13.5px; color: var(--ink-2); line-height: 1.6; margin: 0; }
+.lp-step .was {
+  font-size: 12px; color: var(--muted); margin: 0; padding-top: 6px;
+  border-top: 1px solid var(--rule);
+}
+.lp-step .was b { color: var(--serious-ink); font-weight: 600; }
+
+/* ---------- хэмжигдэхүүний жагсаалт ---------- */
+
+.lp-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; }
+.lp-fields > div { border-top: 1px solid var(--rule); padding-top: 10px; }
+.lp-fields h4 {
+  font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); font-weight: 600; margin: 0 0 6px;
+}
+.lp-fields ul { margin: 0; padding: 0; list-style: none; }
+.lp-fields li { font-size: 13px; color: var(--ink-2); padding: 2px 0; }
+
+/* ---------- бусад аймаг ---------- */
+
+.lp-scale {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+  gap: 36px; align-items: center;
+}
+@media (max-width: 820px) { .lp-scale { grid-template-columns: 1fr; gap: 24px; } }
+
+.lp-aimags { display: flex; flex-wrap: wrap; gap: 6px; }
+.lp-aimags span {
+  font-size: 12px; color: var(--ink-2); border: 1px solid var(--rule-strong);
+  border-radius: 99px; padding: 3px 11px; background: var(--ground);
+}
+.lp-aimags span.on {
+  background: var(--accent); border-color: var(--accent);
+  color: var(--on-accent); font-weight: 600;
+}
+
+/* ---------- хөл ---------- */
+
+.lp-foot {
+  border-top: 1px solid var(--rule);
+  max-width: 1180px; margin: 0 auto; padding: 28px 20px 44px;
+  display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  font-size: 12px; color: var(--muted);
+}
+.lp-foot a { color: var(--ink-2); }
